@@ -1,7 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { Button } from '../../components/Button';
-import { PencilSimpleLine } from 'phosphor-react-native';
+import { PencilSimpleLine, Plus } from 'phosphor-react-native';
 import Colors from '../../constants/Colors';
 import { Fonts } from '../../constants/Fonts';
 import StatusTrue from '../../assets/svg/true.svg';
@@ -48,6 +48,50 @@ function Home(): JSX.Element {
           lineHeight: 18.2,
         }}
       />
+
+      <View
+        style={{
+          paddingTop: 40,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 16,
+            lineHeight: 20.8,
+            fontFamily: Fonts.regular,
+            color: Colors.grays.gray1,
+            paddingBottom: 8,
+          }}
+        >
+          Refeições
+        </Text>
+
+        <Button
+          title="Nova refeição"
+          titleStyle={{
+            fontSize: 14,
+            lineHeight: 18.2,
+            fontFamily: Fonts.bold,
+            color: Colors.white,
+          }}
+          style={{
+            width: '100%',
+            height: 50,
+            paddingVertical: 16,
+            paddingHorizontal: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 12,
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: Colors.grays.gray1,
+            borderRadius: 6,
+            backgroundColor: Colors.grays.gray2,
+          }}
+        >
+          <Plus color={Colors.white} size={18} />
+        </Button>
+      </View>
 
       {/* <Button
         title="Label"
