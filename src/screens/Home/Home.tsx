@@ -7,17 +7,49 @@ import { Fonts } from '../../constants/Fonts';
 import StatusTrue from '../../assets/svg/true.svg';
 import StatusFalse from '../../assets/svg/false.svg';
 import { Input } from '../../components/Input';
+import { Header } from '../../components/Header';
+import styles from './styles';
+import { Card } from '../../components/Card';
 
 function Home(): JSX.Element {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Button
+    <View style={styles.container}>
+      <Header />
+
+      <Card
+        number={'90.86'}
+        text={'das refeições dentro da dieta'}
+        percent
+        icon
+        containerStyle={{
+          marginTop: 30,
+          height: 102,
+          width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingTop: 20,
+          paddingBottom: 20,
+          paddingRight: 16,
+          paddingLeft: 16,
+          gap: 2,
+          backgroundColor: Colors.greens.greensLight,
+          borderRadius: 8,
+        }}
+        numberStyle={{
+          color: Colors.grays.gray1,
+          fontFamily: Fonts.bold,
+          fontSize: 32,
+          lineHeight: 41.6,
+        }}
+        textStyle={{
+          color: Colors.grays.gray1,
+          fontFamily: Fonts.regular,
+          fontSize: 14,
+          lineHeight: 18.2,
+        }}
+      />
+
+      {/* <Button
         title="Label"
         titleStyle={{
           fontSize: 14,
@@ -93,7 +125,7 @@ function Home(): JSX.Element {
           padding: 14,
           gap: 8,
         }}
-      />
+      /> */}
     </View>
   );
 }
