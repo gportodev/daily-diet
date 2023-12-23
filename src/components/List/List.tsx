@@ -73,6 +73,7 @@ function List(): JSX.Element {
             <View
               style={{
                 paddingTop: 32,
+                paddingBottom: 8,
               }}
             >
               <Text
@@ -89,9 +90,6 @@ function List(): JSX.Element {
             <FlatList
               data={item.meals}
               scrollEnabled={false}
-              contentContainerStyle={{
-                paddingTop: 8,
-              }}
               renderItem={({ item }) => (
                 <View style={styles.container}>
                   <View style={styles.wrap}>
