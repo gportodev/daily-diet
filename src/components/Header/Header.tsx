@@ -3,7 +3,7 @@ import styles from './styles';
 import { ForkKnife } from 'phosphor-react-native';
 import Colors from '../../constants/Colors';
 import { View, Image } from 'react-native';
-import Logo from '../../assets/svg/logo.svg';
+import { Logo } from '../../assets/Loader';
 
 function Header(): JSX.Element {
   return (

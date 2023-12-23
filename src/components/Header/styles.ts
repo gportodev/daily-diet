@@ -26,7 +26,6 @@ export default StyleSheet.create({
     height: 40,
     borderRadius: 40,
     borderWidth: 2,
-    borderStyle: 'solid',
     borderColor: Colors.grays.gray2,
   },
 });

@@ -10,6 +10,7 @@ import { Input } from '../../components/Input';
 import { Header } from '../../components/Header';
 import styles from './styles';
 import { Card } from '../../components/Card';
+import { List } from '../../components/List';
 
 function Home(): JSX.Element {
   return (
@@ -92,6 +93,8 @@ function Home(): JSX.Element {
           <Plus color={Colors.white} size={18} />
         </Button>
       </View>
+
+      <List />
 
       {/* <Button
         title="Label"
