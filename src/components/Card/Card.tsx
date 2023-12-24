@@ -4,6 +4,8 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { ArrowUpRight } from 'phosphor-react-native';
 import Colors from '../../constants/Colors';
 import styles from './styles';
+import { useNavigation } from '@react-navigation/native';
+import { NavigationProps } from '../../routes/types';
 
 function Card({
   number,
@@ -14,15 +16,21 @@ function Card({
   numberStyle,
   textStyle,
 }: CardProps): JSX.Element {
+  const navigation = useNavigation<NavigationProps>();
+
+  const handleNavigation = (): void => {
+    const params = {
+      number,
+      text,
+    };
+
+    navigation.navigate('Statistics', params);
+  };
+
   return (
     <View style={containerStyle}>
       {icon && (
-        <TouchableOpacity
-          onPress={() => {
-            console.log('apertou');
-          }}
-          style={styles.iconStyle}
-        >
+        <TouchableOpacity onPress={handleNavigation} style={styles.iconStyle}>
           <ArrowUpRight color={Colors.greens.greensDark} size={24} />
         </TouchableOpacity>
       )}

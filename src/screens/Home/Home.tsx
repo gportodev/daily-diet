@@ -19,7 +19,7 @@ function Home(): JSX.Element {
         <Header />
 
         <Card
-          number={'90.86'}
+          number={'90,86'}
           text={'das refeições dentro da dieta'}
           percent
           icon

@@ -5,13 +5,7 @@ import { Home } from '../screens/Home';
 import { Feedback } from '../screens/Feedback';
 import { New } from '../screens/New';
 import { Statistics } from '../screens/Statistics';
-
-type RootStackParamList = {
-  Home: undefined;
-  Statistics: undefined;
-  New: undefined;
-  Feedback: undefined;
-};
+import { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -27,7 +21,13 @@ function Routes(): JSX.Element {
           }}
         />
 
-        <Stack.Screen name="Statistics" component={Statistics} />
+        <Stack.Screen
+          name="Statistics"
+          component={Statistics}
+          options={{
+            headerShown: false,
+          }}
+        />
 
         <Stack.Screen name="New" component={New} />
 
