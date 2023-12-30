@@ -5,6 +5,7 @@ type CardProps = {
   text: string;
   percent?: boolean;
   icon?: boolean;
+  iconPosition?: 'left' | 'right';
   containerStyle?: ViewStyle;
   numberStyle?: TextStyle;
   textStyle?: TextStyle;

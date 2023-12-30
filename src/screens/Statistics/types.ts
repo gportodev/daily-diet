@@ -1,6 +1,14 @@
+import { ViewStyle } from 'react-native';
+
 type StatisticsProps = {
   number: string;
   text: string;
 };
 
-export { StatisticsProps };
+type Item = {
+  number: string;
+  description: string;
+  style: ViewStyle;
+};
+
+export { StatisticsProps, Item };

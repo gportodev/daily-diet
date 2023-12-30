@@ -1,7 +1,7 @@
 import React from 'react';
 import { CardProps } from './types';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { ArrowUpRight } from 'phosphor-react-native';
+import { ArrowLeft, ArrowUpRight } from 'phosphor-react-native';
 import Colors from '../../constants/Colors';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +12,7 @@ function Card({
   text,
   percent,
   icon,
+  iconPosition,
   containerStyle,
   numberStyle,
   textStyle,
@@ -27,10 +28,23 @@ function Card({
     navigation.navigate('Statistics', params);
   };
 
+  const handleGoBack = (): void => {
+    navigation.goBack();
+  };
+
   return (
     <View style={containerStyle}>
-      {icon && (
-        <TouchableOpacity onPress={handleNavigation} style={styles.iconStyle}>
+      {icon && iconPosition === 'left' && (
+        <TouchableOpacity onPress={handleGoBack} style={styles.iconLeftStyle}>
+          <ArrowLeft color={Colors.greens.greensDark} size={24} />
+        </TouchableOpacity>
+      )}
+
+      {icon && iconPosition === 'right' && (
+        <TouchableOpacity
+          onPress={handleNavigation}
+          style={styles.iconRightStyle}
+        >
           <ArrowUpRight color={Colors.greens.greensDark} size={24} />
         </TouchableOpacity>
       )}

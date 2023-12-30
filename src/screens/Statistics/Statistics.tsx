@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { StatisticsProps } from './types';
+import { Item, StatisticsProps } from './types';
 import { Card } from '../../components/Card';
 import { useRoute } from '@react-navigation/native';
 import Colors from '../../constants/Colors';
@@ -11,13 +11,68 @@ function Statistics(): JSX.Element {
 
   const { number, text } = route.params as StatisticsProps;
 
+  const list = [
+    {
+      number: '22',
+      description: 'melhor sequência de pratos dentro da dieta',
+      style: {
+        height: 89,
+        backgroundColor: Colors.grays.gray6,
+        padding: 16,
+        borderRadius: 8,
+      },
+    },
+    {
+      number: '109',
+      description: 'refeições registradas',
+      style: {
+        height: 89,
+        backgroundColor: Colors.grays.gray6,
+        padding: 16,
+        borderRadius: 8,
+      },
+    },
+  ];
+
+  const subList: Item[] = [
+    {
+      number: '99',
+      description: 'refeições dentro da dieta',
+      style: {
+        width: '48%',
+        justifyContent: 'center',
+        height: 107,
+        backgroundColor: Colors.greens.greensLight,
+        padding: 16,
+        borderRadius: 8,
+      },
+    },
+    {
+      number: '10',
+      description: 'refeições fora da dieta',
+      style: {
+        width: '48%',
+        justifyContent: 'center',
+        height: 107,
+        backgroundColor: Colors.reds.redLight,
+        padding: 16,
+        borderRadius: 8,
+      },
+    },
+  ];
+
   return (
-    <View>
+    <View
+      style={{
+        backgroundColor: Colors.greens.greensLight,
+      }}
+    >
       <Card
         number={number}
         text={text}
         percent
         icon
+        iconPosition="left"
         containerStyle={{
           height: 200,
           width: '100%',
@@ -28,7 +83,6 @@ function Statistics(): JSX.Element {
           paddingRight: 16,
           paddingLeft: 16,
           gap: 2,
-          backgroundColor: Colors.greens.greensLight,
           borderRadius: 8,
         }}
         numberStyle={{
@@ -49,9 +103,11 @@ function Statistics(): JSX.Element {
         style={{
           width: '100%',
           height: '100%',
-          alignItems: 'center',
           paddingHorizontal: 24,
           paddingTop: 33,
+          backgroundColor: Colors.grays.gray7,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
         }}
       >
         <Text
@@ -61,42 +117,76 @@ function Statistics(): JSX.Element {
             fontFamily: Fonts.bold,
             color: Colors.grays.gray1,
             paddingBottom: 23,
+            alignSelf: 'center',
           }}
         >
           Estatísticas gerais
         </Text>
 
-        <Card
-          number={number}
-          text={text}
-          percent
-          icon
-          containerStyle={{
-            height: 89,
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingTop: 20,
-            paddingBottom: 20,
-            paddingRight: 16,
-            paddingLeft: 16,
-            gap: 2,
-            backgroundColor: Colors.greens.greensLight,
-            borderRadius: 8,
+        <View
+          style={{
+            flexDirection: 'column',
+            gap: 12,
+            justifyContent: 'space-between',
           }}
-          numberStyle={{
-            color: Colors.grays.gray1,
-            fontFamily: Fonts.bold,
-            fontSize: 32,
-            lineHeight: 41.6,
+        >
+          {list.map(item => {
+            return (
+              <Card
+                key={item.number}
+                number={item.number}
+                text={item.description}
+                containerStyle={item.style}
+                numberStyle={{
+                  color: Colors.grays.gray1,
+                  fontFamily: Fonts.bold,
+                  fontSize: 32,
+                  lineHeight: 41.6,
+                }}
+                textStyle={{
+                  color: Colors.grays.gray1,
+                  fontFamily: Fonts.regular,
+                  fontSize: 14,
+                  lineHeight: 18.2,
+                }}
+              />
+            );
+          })}
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 12,
           }}
-          textStyle={{
-            color: Colors.grays.gray1,
-            fontFamily: Fonts.regular,
-            fontSize: 14,
-            lineHeight: 18.2,
-          }}
-        />
+        >
+          {subList.map(item => {
+            return (
+              <Card
+                key={item.number}
+                number={item.number}
+                text={item.description}
+                containerStyle={item.style}
+                numberStyle={{
+                  color: Colors.grays.gray1,
+                  fontFamily: Fonts.bold,
+                  fontSize: 24,
+                  lineHeight: 31.2,
+                  textAlign: 'center',
+                }}
+                textStyle={{
+                  color: Colors.grays.gray1,
+                  fontFamily: Fonts.regular,
+                  fontSize: 14,
+                  lineHeight: 18.2,
+                  textAlign: 'center',
+                  width: 125.5,
+                }}
+              />
+            );
+          })}
+        </View>
       </View>
     </View>
   );

@@ -23,6 +23,7 @@ function Home(): JSX.Element {
           text={'das refeições dentro da dieta'}
           percent
           icon
+          iconPosition="right"
           containerStyle={{
             marginTop: 30,
             height: 102,

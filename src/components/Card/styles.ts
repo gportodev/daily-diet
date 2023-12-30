@@ -5,9 +5,15 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconStyle: {
+  iconRightStyle: {
     top: 8,
     right: 8,
+    alignSelf: 'flex-end',
+    position: 'absolute',
+  },
+  iconLeftStyle: {
+    bottom: '80%',
+    left: '10%',
     alignSelf: 'flex-end',
     position: 'absolute',
   },
