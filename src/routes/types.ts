@@ -3,7 +3,7 @@ import { NavigationProp } from '@react-navigation/native';
 type RootStackParamList = {
   Home: undefined;
   Statistics: {
-    number: string;
+    value: number;
     text: string;
   };
   New: undefined;

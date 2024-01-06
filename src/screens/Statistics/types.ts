@@ -1,12 +1,12 @@
 import { ViewStyle } from 'react-native';
 
 type StatisticsProps = {
-  number: string;
+  value: number;
   text: string;
 };
 
 type Item = {
-  number: string;
+  value: number;
   description: string;
   style: ViewStyle;
 };

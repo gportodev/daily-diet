@@ -5,15 +5,16 @@ import { Card } from '../../components/Card';
 import { useRoute } from '@react-navigation/native';
 import Colors from '../../constants/Colors';
 import { Fonts } from '../../constants/Fonts';
+import { getArrowStatus, getCardStatus } from '../Home/helpers';
 
 function Statistics(): JSX.Element {
   const route = useRoute();
 
-  const { number, text } = route.params as StatisticsProps;
+  const { value, text } = route.params as StatisticsProps;
 
   const list = [
     {
-      number: '22',
+      value: 22,
       description: 'melhor sequência de pratos dentro da dieta',
       style: {
         height: 89,
@@ -23,7 +24,7 @@ function Statistics(): JSX.Element {
       },
     },
     {
-      number: '109',
+      value: 109,
       description: 'refeições registradas',
       style: {
         height: 89,
@@ -36,7 +37,7 @@ function Statistics(): JSX.Element {
 
   const subList: Item[] = [
     {
-      number: '99',
+      value: 99,
       description: 'refeições dentro da dieta',
       style: {
         width: '48%',
@@ -48,7 +49,7 @@ function Statistics(): JSX.Element {
       },
     },
     {
-      number: '10',
+      value: 10,
       description: 'refeições fora da dieta',
       style: {
         width: '48%',
@@ -68,10 +69,11 @@ function Statistics(): JSX.Element {
       }}
     >
       <Card
-        number={number}
+        value={value}
         text={text}
         percent
         icon
+        iconStyle={getArrowStatus(value)}
         iconPosition="left"
         containerStyle={{
           height: 200,
@@ -84,6 +86,7 @@ function Statistics(): JSX.Element {
           paddingLeft: 16,
           gap: 2,
           borderRadius: 8,
+          backgroundColor: getCardStatus(value),
         }}
         numberStyle={{
           color: Colors.grays.gray1,
@@ -133,8 +136,8 @@ function Statistics(): JSX.Element {
           {list.map(item => {
             return (
               <Card
-                key={item.number}
-                number={item.number}
+                key={item.value}
+                value={item.value}
                 text={item.description}
                 containerStyle={item.style}
                 numberStyle={{
@@ -164,8 +167,8 @@ function Statistics(): JSX.Element {
           {subList.map(item => {
             return (
               <Card
-                key={item.number}
-                number={item.number}
+                key={item.value}
+                value={item.value}
                 text={item.description}
                 containerStyle={item.style}
                 numberStyle={{

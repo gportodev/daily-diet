@@ -13,16 +13,27 @@ import { Card } from '../../components/Card';
 import { List } from '../../components/List';
 
 function Home(): JSX.Element {
+  const value = 91.86;
+
+  const getCardStatus = (): string => {
+    return value > 90 ? Colors.greens.greensLight : Colors.reds.redLight;
+  };
+
+  const getArrowStatus = (): string => {
+    return value > 90 ? Colors.greens.greensDark : Colors.reds.redDark;
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.container}>
         <Header />
 
         <Card
-          number={'90,86'}
+          value={value}
           text={'das refeições dentro da dieta'}
           percent
           icon
+          iconStyle={getArrowStatus()}
           iconPosition="right"
           containerStyle={{
             marginTop: 30,
@@ -35,7 +46,7 @@ function Home(): JSX.Element {
             paddingRight: 16,
             paddingLeft: 16,
             gap: 2,
-            backgroundColor: Colors.greens.greensLight,
+            backgroundColor: getCardStatus(),
             borderRadius: 8,
           }}
           numberStyle={{
