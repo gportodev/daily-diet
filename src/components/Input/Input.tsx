@@ -1,20 +1,25 @@
 import React from 'react';
-import { TextInput } from 'react-native';
+import { Text, TextInput } from 'react-native';
 import { type InputProps } from './types';
+import styles from './styles';
 
 function Input({
   value,
   onChange,
   placeholder,
+  title,
   ...rest
 }: InputProps): JSX.Element {
   return (
-    <TextInput
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      {...rest}
-    />
+    <>
+      <Text style={styles.title}>{title}</Text>
+      <TextInput
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        {...rest}
+      />
+    </>
   );
 }
 

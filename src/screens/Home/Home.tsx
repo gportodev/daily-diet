@@ -11,9 +11,11 @@ import { Header } from '../../components/Header';
 import styles from './styles';
 import { Card } from '../../components/Card';
 import { List } from '../../components/List';
+import { useNavigation } from '@react-navigation/native';
 
 function Home(): JSX.Element {
   const value = 91.86;
+  const navigation = useNavigation();
 
   const getCardStatus = (): string => {
     return value > 90 ? Colors.greens.greensLight : Colors.reds.redLight;
@@ -21,6 +23,10 @@ function Home(): JSX.Element {
 
   const getArrowStatus = (): string => {
     return value > 90 ? Colors.greens.greensDark : Colors.reds.redDark;
+  };
+
+  const handleNewMeal = (): void => {
+    navigation.navigate('New');
   };
 
   return (
@@ -81,6 +87,7 @@ function Home(): JSX.Element {
           </Text>
 
           <Button
+            onPress={handleNewMeal}
             title="Nova refeição"
             titleStyle={{
               fontSize: 14,

@@ -6,6 +6,8 @@ import { Feedback } from '../screens/Feedback';
 import { New } from '../screens/New';
 import { Statistics } from '../screens/Statistics';
 import { RootStackParamList } from './types';
+import { View } from 'react-native';
+import Colors from '../constants/Colors';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -29,7 +31,15 @@ function Routes(): JSX.Element {
           }}
         />
 
-        <Stack.Screen name="New" component={New} />
+        <Stack.Screen
+          name="New"
+          component={New}
+          options={{
+            title: 'Nova refeição',
+            headerTitleAlign: 'center',
+            headerTransparent: true,
+          }}
+        />
 
         <Stack.Screen name="Feedback" component={Feedback} />
       </Stack.Navigator>

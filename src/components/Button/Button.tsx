@@ -9,9 +9,14 @@ function Button({
   titleStyle,
   style,
   disabled,
+  onPress,
 }: ButtonProps): JSX.Element {
   return (
-    <TouchableOpacity style={[styles.container, style]} disabled={disabled}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.container, style]}
+      disabled={disabled}
+    >
       {children}
 
       {title && <Text style={titleStyle}>{title}</Text>}
