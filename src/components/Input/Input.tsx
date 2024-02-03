@@ -12,7 +12,7 @@ function Input({
 }: InputProps): JSX.Element {
   return (
     <>
-      <Text style={styles.title}>{title}</Text>
+      {title && <Text style={styles.title}>{title}</Text>}
       <TextInput
         value={value}
         onChange={onChange}

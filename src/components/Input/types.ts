@@ -1,7 +1,7 @@
 import { type TextInputProps } from 'react-native';
 
 type InputProps = TextInputProps & {
-  title: string;
+  title?: string;
 };
 
 export { InputProps };

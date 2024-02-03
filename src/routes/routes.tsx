@@ -35,9 +35,7 @@ function Routes(): JSX.Element {
           name="New"
           component={New}
           options={{
-            title: 'Nova refeição',
-            headerTitleAlign: 'center',
-            headerTransparent: true,
+            headerShown: false,
           }}
         />
 
