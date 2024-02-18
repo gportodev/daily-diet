@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Input } from '../../components/Input';
 import styles from './styles';
 import { Button } from '../../components/Button';
@@ -24,6 +17,14 @@ type ButtonProp = {
 };
 
 function New(): JSX.Element {
+  const [data, setData] = useState({
+    name: '',
+    description: '',
+    date: '',
+    time: '',
+    isPartOfDiet: true,
+  });
+
   const [positiveButton, setPositiveButton] = useState<ButtonProp>({
     active: false,
     backgroundColor: Colors.grays.gray6,
@@ -66,6 +67,12 @@ function New(): JSX.Element {
 
   const handleGoBack = (): void => {
     navigation.goBack();
+  };
+
+  const handleNewMeal = (): void => {
+    navigation.navigate('Feedback', {
+      partOfDiet: data.isPartOfDiet,
+    });
   };
 
   return (
@@ -116,11 +123,19 @@ function New(): JSX.Element {
             }}
           >
             <View>
-              <Input title="Data" style={styles.inputDatetime} />
+              <Input
+                title="Data"
+                style={styles.inputDatetime}
+                keyboardType="numeric"
+              />
             </View>
 
             <View>
-              <Input title="Hora" style={styles.inputDatetime} />
+              <Input
+                title="Hora"
+                style={styles.inputDatetime}
+                keyboardType="numeric"
+              />
             </View>
           </View>
 
@@ -172,7 +187,7 @@ function New(): JSX.Element {
           </View>
 
           <Button
-            // onPress={handleNewMeal}
+            onPress={handleNewMeal}
             title="Cadastrar refeição"
             titleStyle={{
               fontSize: 14,
