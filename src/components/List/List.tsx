@@ -1,28 +1,40 @@
 import React from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import styles from './styles';
 import { Fonts } from '../../constants/Fonts';
 import { Circle, Divider } from '../../assets/Loader';
 import Colors from '../../constants/Colors';
+import { useNavigation } from '@react-navigation/native';
+import { NavigationProps } from '../../routes/types';
+import { MealProps } from '../../screens/Home/types';
 
 function List(): JSX.Element {
   const arr = [
     {
+      name: 'Sanduíche',
+      date: '12/08/2022',
       time: '20:00',
-      description: 'Xtudo',
+      description:
+        'Sanduíche de pão integral com atum e salada de alface e tomate',
       isPartOfDiet: false,
     },
     {
+      name: 'Whey',
+      date: '12/08/2022',
       time: '16:00',
       description: 'Whey',
       isPartOfDiet: true,
     },
     {
+      name: 'Salada cesar com frango',
+      date: '12/08/2022',
       time: '12:30',
       description: 'Salada cesar com frango',
       isPartOfDiet: true,
     },
     {
+      name: 'Vitamina de banana',
+      date: '12/08/2022',
       time: '09:30',
       description: 'Vitamina de banana',
       isPartOfDiet: true,
@@ -39,6 +51,20 @@ function List(): JSX.Element {
       meals: arr,
     },
   ];
+
+  const navigation = useNavigation<NavigationProps>();
+
+  const handleMeal = (item: MealProps): void => {
+    const { name, description, date, time, isPartOfDiet } = item;
+
+    navigation.navigate('Meal', {
+      name,
+      description,
+      date,
+      time,
+      isPartOfDiet,
+    });
+  };
 
   return (
     <>
@@ -68,15 +94,18 @@ function List(): JSX.Element {
               data={item.meals}
               scrollEnabled={false}
               renderItem={({ item }) => (
-                <View style={styles.container}>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleMeal(item);
+                  }}
+                  style={styles.container}
+                >
                   <View style={styles.wrap}>
                     <Text style={styles.timeText}>{item.time}</Text>
 
                     <Divider style={styles.divider} />
 
-                    <Text style={styles.descriptionText}>
-                      {item.description}
-                    </Text>
+                    <Text style={styles.descriptionText}>{item.name}</Text>
                   </View>
 
                   <Circle
@@ -88,7 +117,7 @@ function List(): JSX.Element {
                         : Colors.reds.redMid
                     }
                   />
-                </View>
+                </TouchableOpacity>
               )}
             />
           </>

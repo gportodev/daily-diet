@@ -12,6 +12,7 @@ import styles from './styles';
 import { Card } from '../../components/Card';
 import { List } from '../../components/List';
 import { useNavigation } from '@react-navigation/native';
+import { MealProps } from './types';
 
 function Home(): JSX.Element {
   const value = 91.86;

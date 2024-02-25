@@ -1,5 +1,6 @@
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MealProps } from '../screens/Home/types';
 
 type RootStackParamList = {
   Home: undefined;
@@ -8,6 +9,7 @@ type RootStackParamList = {
     text: string;
   };
   New: undefined;
+  Meal: MealProps;
   Feedback: {
     partOfDiet: boolean;
   };

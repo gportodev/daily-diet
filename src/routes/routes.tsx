@@ -6,6 +6,7 @@ import { Feedback } from '../screens/Feedback';
 import { New } from '../screens/New';
 import { Statistics } from '../screens/Statistics';
 import { RootStackParamList } from './types';
+import { Meal } from '../screens/Meal';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -32,6 +33,14 @@ function Routes(): JSX.Element {
         <Stack.Screen
           name="New"
           component={New}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="Meal"
+          component={Meal}
           options={{
             headerShown: false,
           }}
