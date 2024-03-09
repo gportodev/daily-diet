@@ -8,11 +8,12 @@ function Input({
   onChange,
   placeholder,
   title,
+  titleStyle,
   ...rest
 }: InputProps): JSX.Element {
   return (
     <>
-      {title && <Text style={styles.title}>{title}</Text>}
+      {title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
       <TextInput
         value={value}
         onChange={onChange}

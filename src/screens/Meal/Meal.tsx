@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Input } from '../../components/Input';
 import styles from './styles';
@@ -22,6 +23,18 @@ type ButtonProp = {
 
 function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   const { name, description, date, time, isPartOfDiet } = route.params;
+
+  const [editable, setEditable] = useState(false);
+
+  const methods = useForm({
+    defaultValues: {
+      name,
+      description,
+      date,
+      time,
+      isPartOfDiet,
+    },
+  });
 
   const [data, setData] = useState({
     name,
@@ -98,13 +111,71 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
         </View>
 
         <View style={styles.content}>
-          <View>
-            {/* <Input title="Nome" style={styles.inputText} /> */}
-            <Text style={styles.title}>{data.name}</Text>
-          </View>
+          <FormProvider {...methods}>
+            <View>
+              {editable ? (
+                <Controller
+                  name="name"
+                  render={({ field, fieldState }) => (
+                    <Input
+                      editable={editable}
+                      title="Nome"
+                      titleStyle={{
+                        fontSize: 20,
+                        lineHeight: 26,
+                      }}
+                      style={styles.inputText}
+                      {...{ ...field, ...fieldState }}
+                    />
+                  )}
+                />
+              ) : (
+                <Text
+                  style={[
+                    styles.title,
+                    {
+                      fontSize: 20,
+                      lineHeight: 26,
+                    },
+                  ]}
+                >
+                  {methods.getValues('name')}
+                </Text>
+              )}
+            </View>
 
-          <View>
-            {/* <Input
+            <View>
+              <Controller
+                name="description"
+                render={({ field, fieldState }) => (
+                  <Input
+                    editable={editable}
+                    title={editable ? 'Nome' : field.value}
+                    titleStyle={
+                      editable
+                        ? {}
+                        : {
+                            fontSize: 20,
+                            lineHeight: 26,
+                          }
+                    }
+                    style={[
+                      styles.inputText,
+                      {
+                        height: 120,
+                        alignItems: 'flex-start',
+                        justifyContent: 'flex-start',
+                        verticalAlign: 'top',
+                        borderWidth: editable ? 1 : 0,
+                        padding: editable ? 14 : 0,
+                        opacity: 1,
+                      },
+                    ]}
+                    {...{ ...field, ...fieldState }}
+                  />
+                )}
+              />
+              {/* <Input
               title="Descrição"
               style={[
                 styles.inputText,
@@ -117,41 +188,41 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
               ]}
               multiline
             /> */}
-            <Text>{data.description}</Text>
-          </View>
+              <Text>{data.description}</Text>
+            </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              gap: 20,
-              height: 70,
-            }}
-          >
-            <View>
-              {/* <Input
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: 20,
+                height: 70,
+              }}
+            >
+              <View>
+                {/* <Input
                 title="Data"
                 style={styles.inputDatetime}
                 keyboardType="numeric"
               /> */}
-              <Text style={styles.title}>Data e hora</Text>
+                <Text style={styles.title}>Data e hora</Text>
 
-              <Text>{data.date + ' às ' + data.time}</Text>
-            </View>
+                <Text>{data.date + ' às ' + data.time}</Text>
+              </View>
 
-            <View>
-              {/* <Input
+              <View>
+                {/* <Input
                 title="Hora"
                 style={styles.inputDatetime}
                 keyboardType="numeric"
               /> */}
+              </View>
             </View>
-          </View>
 
-          <View>
-            {/* <Text style={styles.title}>Está dentro da dieta?</Text> */}
+            <View>
+              {/* <Text style={styles.title}>Está dentro da dieta?</Text> */}
 
-            {/* <View
+              {/* <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -193,52 +264,94 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                 <Circle color={Colors.reds.redDark} />
               </Button>
             </View> */}
-            <View style={styles.tag}>
-              <Circle
-                color={
-                  data.isPartOfDiet
-                    ? Colors.greens.greensDark
-                    : Colors.reds.redDark
-                }
-              />
-              <Text>
-                {data.isPartOfDiet ? 'dentro da dieta' : 'fora da dieta'}
-              </Text>
+              <View style={styles.tag}>
+                <Circle
+                  color={
+                    data.isPartOfDiet
+                      ? Colors.greens.greensDark
+                      : Colors.reds.redDark
+                  }
+                />
+                <Text>
+                  {data.isPartOfDiet ? 'dentro da dieta' : 'fora da dieta'}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          <Button
-            // onPress={handleNewMeal}
-            title="Editar refeição"
-            titleStyle={{
-              fontSize: 14,
-              lineHeight: 18.2,
-              fontFamily: Fonts.bold,
-              color: Colors.white,
-            }}
-            style={styles.submitButtonContainer}
-          >
-            <PencilSimpleLine color={Colors.white} size={18} />
-          </Button>
+            {editable ? (
+              <>
+                <Button
+                  onPress={() => {
+                    setEditable(false);
+                  }}
+                  title="Salvar alterações"
+                  titleStyle={{
+                    fontSize: 14,
+                    lineHeight: 18.2,
+                    fontFamily: Fonts.bold,
+                    color: Colors.white,
+                  }}
+                  style={styles.submitButtonContainer}
+                />
 
-          <Button
-            // onPress={handleNewMeal}
-            title="Excluir refeição"
-            titleStyle={{
-              fontSize: 14,
-              lineHeight: 18.2,
-              fontFamily: Fonts.bold,
-              color: Colors.grays.gray1,
-            }}
-            style={[
-              styles.submitButtonContainer,
-              {
-                backgroundColor: Colors.white,
-              },
-            ]}
-          >
-            <Trash color={Colors.grays.gray1} size={18} />
-          </Button>
+                <Button
+                  onPress={() => {
+                    setEditable(false);
+                  }}
+                  title="Cancelar"
+                  titleStyle={{
+                    fontSize: 14,
+                    lineHeight: 18.2,
+                    fontFamily: Fonts.bold,
+                    color: Colors.grays.gray1,
+                  }}
+                  style={[
+                    styles.submitButtonContainer,
+                    {
+                      backgroundColor: Colors.white,
+                    },
+                  ]}
+                />
+              </>
+            ) : (
+              <>
+                <Button
+                  onPress={() => {
+                    setEditable(true);
+                  }}
+                  title="Editar refeição"
+                  titleStyle={{
+                    fontSize: 14,
+                    lineHeight: 18.2,
+                    fontFamily: Fonts.bold,
+                    color: Colors.white,
+                  }}
+                  style={styles.submitButtonContainer}
+                >
+                  <PencilSimpleLine color={Colors.white} size={18} />
+                </Button>
+
+                <Button
+                  // onPress={handleNewMeal}
+                  title="Excluir refeição"
+                  titleStyle={{
+                    fontSize: 14,
+                    lineHeight: 18.2,
+                    fontFamily: Fonts.bold,
+                    color: Colors.grays.gray1,
+                  }}
+                  style={[
+                    styles.submitButtonContainer,
+                    {
+                      backgroundColor: Colors.white,
+                    },
+                  ]}
+                >
+                  <Trash color={Colors.grays.gray1} size={18} />
+                </Button>
+              </>
+            )}
+          </FormProvider>
         </View>
       </View>
     </ScrollView>
