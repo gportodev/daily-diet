@@ -7,14 +7,10 @@ const width = Dimensions.get('screen').width;
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.greens.greensLight,
   },
   header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 82,
-    height: 104,
-    paddingLeft: 24,
+    justifyContent: 'center',
+    height: 132,
   },
   content: {
     flex: 1,
@@ -60,6 +56,11 @@ export default StyleSheet.create({
     lineHeight: 18.2,
     fontFamily: Fonts.bold,
   },
+  info: {
+    fontSize: 16,
+    lineHeight: 20.8,
+    fontFamily: Fonts.regular,
+  },
   validateButtonContainer: {
     height: 50,
     width: 159.5,
@@ -83,5 +84,9 @@ export default StyleSheet.create({
     borderColor: Colors.grays.gray1,
     borderRadius: 6,
     backgroundColor: Colors.grays.gray2,
+  },
+  buttonsWrap: {
+    gap: 12,
+    // paddingTop: '38%',
   },
 });
