@@ -3,6 +3,7 @@ import { Routes } from './src/routes';
 import useCachedResources from './src/hooks/useCachedResources';
 import { StatusBar } from 'expo-status-bar';
 import { Loader } from './src/components/Loader/Loader';
+import { MealProvider } from './src/context/Context';
 
 export default function App(): JSX.Element {
   const isLoading = useCachedResources();
@@ -14,7 +15,9 @@ export default function App(): JSX.Element {
   return (
     <>
       <StatusBar style="auto" />
-      <Routes />
+      <MealProvider>
+        <Routes />
+      </MealProvider>
     </>
   );
 }

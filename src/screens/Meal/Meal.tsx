@@ -9,12 +9,11 @@ import Colors from '../../constants/Colors';
 import { Circle } from '../../assets/Loader';
 import { StackScreenProps } from '../../routes/types';
 
-import {
-  ArrowLeft,
-  PencilSimpleLine,
-  Trash,
-  TrashSimple,
-} from 'phosphor-react-native';
+import { ArrowLeft, PencilSimpleLine, Trash } from 'phosphor-react-native';
+import { DeleteModal } from '../../components/DeleteModal';
+import { ButtonProps } from '../../components/Button/types';
+import { useMeal } from '../../context/Context';
+import { Loader } from '../../components/Loader/Loader';
 
 type ButtonProp = {
   active: boolean;
@@ -23,7 +22,10 @@ type ButtonProp = {
 };
 
 function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
+  const { mealList, setMealList } = useMeal();
   const { name, description, date, time, isPartOfDiet } = route.params;
+  const [modal, setModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [editable, setEditable] = useState(false);
 
@@ -37,13 +39,8 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     },
   });
 
-  const [data, setData] = useState({
-    name,
-    description,
-    date,
-    time,
-    isPartOfDiet,
-  });
+  const watchName = methods.watch('name');
+  const watchDate = methods.watch('date');
 
   const [positiveButton, setPositiveButton] = useState<ButtonProp>({
     active: false,
@@ -56,6 +53,63 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     backgroundColor: Colors.grays.gray6,
     borderColor: Colors.grays.gray1,
   });
+
+  const handleDeleteMeal = (): void => {
+    setIsLoading(!isLoading);
+
+    const dayListMeal = mealList.find(item => {
+      return item.day === watchDate;
+    })?.meals;
+
+    const newDayListMeal = dayListMeal?.filter(item => item.name !== watchName);
+
+    const newMealList = mealList.map(item => {
+      if (item.day === watchDate) {
+        return {
+          day: item.day,
+          meals: newDayListMeal,
+        };
+      }
+
+      return item;
+    });
+
+    setMealList(newMealList);
+    setModal(!modal);
+
+    setTimeout(() => {
+      setIsLoading(!isLoading);
+      navigation.navigate(`Home`);
+    }, 3000);
+  };
+
+  const buttons: ButtonProps[] = [
+    {
+      title: 'Cancelar',
+      onPress: () => {
+        setModal(!modal);
+      },
+      titleStyle: {
+        fontSize: 14,
+        fontFamily: Fonts.bold,
+        lineHeight: 18.2,
+        color: Colors.grays.gray1,
+      },
+    },
+    {
+      title: 'Sim, excluir',
+      onPress: handleDeleteMeal,
+      titleStyle: {
+        fontSize: 14,
+        fontFamily: Fonts.bold,
+        lineHeight: 18.2,
+        color: Colors.white,
+      },
+      style: {
+        backgroundColor: Colors.grays.gray2,
+      },
+    },
+  ];
 
   const handleRegister = (value: string): void => {
     if (value === 'positive') {
@@ -87,11 +141,32 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     navigation.goBack();
   };
 
-  const handleNewMeal = (): void => {
-    navigation.navigate('Feedback', {
-      partOfDiet: data.isPartOfDiet,
-    });
-  };
+  const renderHeader = (): JSX.Element => (
+    <View style={styles.header}>
+      <View
+        style={{
+          width: '100%',
+          flexDirection: 'row',
+          gap: 103,
+          paddingLeft: 24,
+        }}
+      >
+        <TouchableOpacity onPress={handleGoBack}>
+          <ArrowLeft color={Colors.grays.gray2} size={24} />
+        </TouchableOpacity>
+
+        <Text
+          style={{
+            fontSize: 18,
+            lineHeight: 23.4,
+            fontFamily: Fonts.bold,
+          }}
+        >
+          {editable ? 'Editar refeição' : 'Refeição'}
+        </Text>
+      </View>
+    </View>
+  );
 
   const renderContent = (): JSX.Element => (
     <View style={styles.content}>
@@ -133,10 +208,12 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
           {editable ? (
             <Controller
               name="description"
-              render={({ field, fieldState }) => (
+              render={({ field: { value, onChange } }) => (
                 <Input
                   editable={editable}
                   title="Descrição"
+                  onChange={onChange}
+                  value={value}
                   style={[
                     styles.inputText,
                     {
@@ -149,7 +226,6 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                       opacity: 1,
                     },
                   ]}
-                  {...{ ...field, ...fieldState }}
                 />
               )}
             />
@@ -264,13 +340,15 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
             <View style={styles.tag}>
               <Circle
                 color={
-                  data.isPartOfDiet
+                  methods.getValues('isPartOfDiet')
                     ? Colors.greens.greensDark
                     : Colors.reds.redDark
                 }
               />
               <Text>
-                {data.isPartOfDiet ? 'dentro da dieta' : 'fora da dieta'}
+                {methods.getValues('isPartOfDiet')
+                  ? 'dentro da dieta'
+                  : 'fora da dieta'}
               </Text>
             </View>
           )}
@@ -331,7 +409,9 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
               </Button>
 
               <Button
-                // onPress={handleNewMeal}
+                onPress={() => {
+                  setModal(!modal);
+                }}
                 title="Excluir refeição"
                 titleStyle={{
                   fontSize: 14,
@@ -355,40 +435,23 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     </View>
   );
 
-  const renderHeader = (): JSX.Element => (
-    <View style={styles.header}>
-      <View
-        style={{
-          width: '100%',
-          flexDirection: 'row',
-          gap: 103,
-          paddingLeft: 24,
-        }}
-      >
-        <TouchableOpacity onPress={handleGoBack}>
-          <ArrowLeft color={Colors.grays.gray2} size={24} />
-        </TouchableOpacity>
-
-        <Text
-          style={{
-            fontSize: 18,
-            lineHeight: 23.4,
-            fontFamily: Fonts.bold,
-          }}
-        >
-          {editable ? 'Editar refeição' : 'Refeição'}
-        </Text>
-      </View>
+  return isLoading ? (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+      }}
+    >
+      <Loader />
     </View>
-  );
-
-  return (
+  ) : (
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={{
         backgroundColor: Colors.grays.gray7,
       }}
     >
+      <DeleteModal state={modal} setState={setModal} buttons={buttons} />
       <View
         style={[
           styles.container,

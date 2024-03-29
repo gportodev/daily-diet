@@ -7,50 +7,10 @@ import Colors from '../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProps } from '../../routes/types';
 import { MealProps } from '../../screens/Home/types';
+import { useMeal } from '../../context/Context';
 
 function List(): JSX.Element {
-  const arr = [
-    {
-      name: 'Sanduíche',
-      date: '12/08/2022',
-      time: '20:00',
-      description:
-        'Sanduíche de pão integral com atum e salada de alface e tomate',
-      isPartOfDiet: false,
-    },
-    {
-      name: 'Whey',
-      date: '12/08/2022',
-      time: '16:00',
-      description: 'Whey',
-      isPartOfDiet: true,
-    },
-    {
-      name: 'Salada cesar com frango',
-      date: '12/08/2022',
-      time: '12:30',
-      description: 'Salada cesar com frango',
-      isPartOfDiet: true,
-    },
-    {
-      name: 'Vitamina de banana',
-      date: '12/08/2022',
-      time: '09:30',
-      description: 'Vitamina de banana',
-      isPartOfDiet: true,
-    },
-  ];
-
-  const data = [
-    {
-      day: '12.08.22',
-      meals: arr,
-    },
-    {
-      day: '13.08.22',
-      meals: arr,
-    },
-  ];
+  const { mealList } = useMeal();
 
   const navigation = useNavigation<NavigationProps>();
 
@@ -69,7 +29,7 @@ function List(): JSX.Element {
   return (
     <>
       <FlatList
-        data={data}
+        data={mealList}
         scrollEnabled={false}
         renderItem={({ item }) => (
           <>
