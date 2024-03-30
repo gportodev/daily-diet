@@ -208,24 +208,21 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
           {editable ? (
             <Controller
               name="description"
-              render={({ field: { value, onChange } }) => (
+              render={({ field: { onChange, value } }) => (
                 <Input
                   editable={editable}
                   title="Descrição"
-                  onChange={onChange}
+                  onChangeText={onChange}
                   value={value}
                   style={[
                     styles.inputText,
                     {
                       height: 120,
-                      alignItems: 'flex-start',
-                      justifyContent: 'flex-start',
                       verticalAlign: 'top',
-                      borderWidth: 1,
-                      padding: 14,
-                      opacity: 1,
                     },
                   ]}
+                  multiline
+                  maxLength={150}
                 />
               )}
             />

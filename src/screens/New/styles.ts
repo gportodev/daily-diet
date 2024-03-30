@@ -7,14 +7,12 @@ const width = Dimensions.get('screen').width;
 export default StyleSheet.create({
   container: {
     flex: 1,
+    gap: -24,
     backgroundColor: Colors.grays.gray5,
   },
   header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 82,
-    height: 104,
-    paddingLeft: 24,
+    justifyContent: 'center',
+    height: 132,
   },
   content: {
     flex: 1,

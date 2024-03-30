@@ -9,6 +9,7 @@ import { Circle } from '../../assets/Loader';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProps } from '../../routes/types';
 import { ArrowLeft } from 'phosphor-react-native';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 type ButtonProp = {
   active: boolean;
@@ -17,14 +18,6 @@ type ButtonProp = {
 };
 
 function New(): JSX.Element {
-  const [data, setData] = useState({
-    name: '',
-    description: '',
-    date: '',
-    time: '',
-    isPartOfDiet: true,
-  });
-
   const [positiveButton, setPositiveButton] = useState<ButtonProp>({
     active: false,
     backgroundColor: Colors.grays.gray6,
@@ -37,9 +30,19 @@ function New(): JSX.Element {
     borderColor: Colors.grays.gray1,
   });
 
+  const methods = useForm({
+    defaultValues: {
+      name: '',
+      description: '',
+      date: '',
+      time: '',
+      isPartOfDiet: false,
+    },
+  });
+
   const navigation = useNavigation<NavigationProps>();
 
-  const handleRegister = (value: string): void => {
+  const handleOption = (value: string): void => {
     if (value === 'positive') {
       setPositiveButton({
         active: true,
@@ -51,6 +54,7 @@ function New(): JSX.Element {
         backgroundColor: Colors.grays.gray6,
         borderColor: Colors.grays.gray1,
       });
+      methods.setValue('isPartOfDiet', true);
     } else {
       setNegativeButton({
         active: true,
@@ -62,6 +66,7 @@ function New(): JSX.Element {
         backgroundColor: Colors.grays.gray6,
         borderColor: Colors.grays.gray1,
       });
+      methods.setValue('isPartOfDiet', false);
     }
   };
 
@@ -70,50 +75,82 @@ function New(): JSX.Element {
   };
 
   const handleNewMeal = (): void => {
-    navigation.navigate('Feedback', {
-      partOfDiet: data.isPartOfDiet,
-    });
+    // navigation.navigate('Feedback', {
+    //   partOfDiet: data.isPartOfDiet,
+    // });
+    console.log(methods.getValues());
   };
 
-  return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleGoBack}>
-            <ArrowLeft color={Colors.grays.gray2} size={24} />
-          </TouchableOpacity>
+  const renderHeader = (): JSX.Element => (
+    <View style={styles.header}>
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: 103,
+          paddingLeft: 24,
+        }}
+      >
+        <TouchableOpacity onPress={handleGoBack}>
+          <ArrowLeft color={Colors.grays.gray2} size={24} />
+        </TouchableOpacity>
 
-          <Text
-            style={{
-              fontSize: 18,
-              fontFamily: Fonts.bold,
-            }}
-          >
-            Nova refeição
-          </Text>
+        <Text
+          style={{
+            fontSize: 18,
+            lineHeight: 23.4,
+            fontFamily: Fonts.bold,
+          }}
+        >
+          Nova refeição
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderContent = (): JSX.Element => (
+    <View style={styles.content}>
+      <FormProvider {...methods}>
+        <View>
+          <Controller
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                title="Nome"
+                titleStyle={{
+                  fontSize: 14,
+                  lineHeight: 26,
+                }}
+                style={styles.inputText}
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
         </View>
 
-        <View style={styles.content}>
-          <View>
-            <Input title="Nome" style={styles.inputText} />
-          </View>
+        <View>
+          <Controller
+            name="description"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                title="Descrição"
+                onChangeText={onChange}
+                value={value}
+                style={[
+                  styles.inputText,
+                  {
+                    height: 120,
+                    verticalAlign: 'top',
+                  },
+                ]}
+                multiline
+                maxLength={150}
+              />
+            )}
+          />
+        </View>
 
-          <View>
-            <Input
-              title="Descrição"
-              style={[
-                styles.inputText,
-                {
-                  height: 120,
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-start',
-                  verticalAlign: 'top',
-                },
-              ]}
-              multiline
-            />
-          </View>
-
+        <View>
           <View
             style={{
               flexDirection: 'row',
@@ -123,81 +160,112 @@ function New(): JSX.Element {
             }}
           >
             <View>
-              <Input
-                title="Data"
-                style={styles.inputDatetime}
-                keyboardType="numeric"
+              <Controller
+                name="date"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    title="Data"
+                    style={styles.inputDatetime}
+                    keyboardType="numeric"
+                    onChangeText={onChange}
+                    value={value}
+                    maxLength={10}
+                  />
+                )}
               />
             </View>
 
             <View>
-              <Input
-                title="Hora"
-                style={styles.inputDatetime}
-                keyboardType="numeric"
+              <Controller
+                name="time"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    title="Hora"
+                    style={styles.inputDatetime}
+                    keyboardType="numeric"
+                    onChangeText={onChange}
+                    value={value}
+                    maxLength={4}
+                  />
+                )}
               />
             </View>
           </View>
-
-          <View>
-            <Text style={styles.title}>Está dentro da dieta?</Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                gap: 20,
-                height: 70,
-              }}
-            >
-              <Button
-                disabled={positiveButton.active}
-                onPress={() => {
-                  handleRegister('positive');
-                }}
-                title="Sim"
-                titleStyle={{
-                  fontSize: 14,
-                  lineHeight: 18.2,
-                  fontFamily: Fonts.bold,
-                  color: Colors.grays.gray1,
-                }}
-                style={[styles.validateButtonContainer, positiveButton]}
-              >
-                <Circle color={Colors.greens.greensDark} />
-              </Button>
-
-              <Button
-                disabled={negativeButton.active}
-                onPress={() => {
-                  handleRegister('negative');
-                }}
-                title="Não"
-                titleStyle={{
-                  fontSize: 14,
-                  lineHeight: 18.2,
-                  fontFamily: Fonts.bold,
-                  color: Colors.grays.gray1,
-                }}
-                style={[styles.validateButtonContainer, negativeButton]}
-              >
-                <Circle color={Colors.reds.redDark} />
-              </Button>
-            </View>
-          </View>
-
-          <Button
-            onPress={handleNewMeal}
-            title="Cadastrar refeição"
-            titleStyle={{
-              fontSize: 14,
-              lineHeight: 18.2,
-              fontFamily: Fonts.bold,
-              color: Colors.white,
-            }}
-            style={styles.submitButtonContainer}
-          />
         </View>
+
+        <View>
+          <Text style={styles.title}>Está dentro da dieta?</Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              gap: 20,
+              height: 70,
+            }}
+          >
+            <Button
+              disabled={positiveButton.active}
+              onPress={() => {
+                handleOption('positive');
+              }}
+              title="Sim"
+              titleStyle={{
+                fontSize: 14,
+                lineHeight: 18.2,
+                fontFamily: Fonts.bold,
+                color: Colors.grays.gray1,
+              }}
+              style={[styles.validateButtonContainer, positiveButton]}
+            >
+              <Circle color={Colors.greens.greensDark} />
+            </Button>
+
+            <Button
+              disabled={negativeButton.active}
+              onPress={() => {
+                handleOption('negative');
+              }}
+              title="Não"
+              titleStyle={{
+                fontSize: 14,
+                lineHeight: 18.2,
+                fontFamily: Fonts.bold,
+                color: Colors.grays.gray1,
+              }}
+              style={[styles.validateButtonContainer, negativeButton]}
+            >
+              <Circle color={Colors.reds.redDark} />
+            </Button>
+          </View>
+        </View>
+
+        <Button
+          onPress={handleNewMeal}
+          title="Cadastrar refeição"
+          titleStyle={{
+            fontSize: 14,
+            lineHeight: 18.2,
+            fontFamily: Fonts.bold,
+            color: Colors.white,
+          }}
+          style={styles.submitButtonContainer}
+        />
+      </FormProvider>
+    </View>
+  );
+
+  return (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{
+        backgroundColor: Colors.grays.gray7,
+      }}
+    >
+      <View style={styles.container}>
+        {renderHeader()}
+
+        {renderContent()}
       </View>
     </ScrollView>
   );
