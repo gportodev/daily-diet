@@ -28,7 +28,12 @@ function Home(): JSX.Element {
   };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{
+        backgroundColor: Colors.grays.gray7,
+      }}
+    >
       <View style={styles.container}>
         <Header />
 
