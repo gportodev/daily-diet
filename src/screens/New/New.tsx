@@ -10,6 +10,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NavigationProps } from '../../routes/types';
 import { ArrowLeft } from 'phosphor-react-native';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { ListProps, useMeal } from '../../context/Context';
+import { Loader } from '../../components/Loader/Loader';
 
 type ButtonProp = {
   active: boolean;
@@ -18,6 +20,9 @@ type ButtonProp = {
 };
 
 function New(): JSX.Element {
+  const { mealList, setMealList } = useMeal();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [positiveButton, setPositiveButton] = useState<ButtonProp>({
     active: false,
     backgroundColor: Colors.grays.gray6,
@@ -39,6 +44,11 @@ function New(): JSX.Element {
       isPartOfDiet: false,
     },
   });
+
+  const watchDate = methods.watch('date');
+  const watchIsPartOfDiet = methods.watch('isPartOfDiet');
+
+  const dietOptionSelected = positiveButton.active || negativeButton.active;
 
   const navigation = useNavigation<NavigationProps>();
 
@@ -75,10 +85,40 @@ function New(): JSX.Element {
   };
 
   const handleNewMeal = (): void => {
-    // navigation.navigate('Feedback', {
-    //   partOfDiet: data.isPartOfDiet,
-    // });
-    console.log(methods.getValues());
+    setIsLoading(!isLoading);
+
+    const dayListMeal = mealList.find(item => {
+      return item.day === watchDate;
+    });
+
+    if (dayListMeal) {
+      const newMeal = methods.getValues();
+
+      dayListMeal.meals.push(newMeal);
+
+      const arr = [...mealList];
+
+      setMealList(arr);
+      setTimeout(() => {
+        setIsLoading(!isLoading);
+        navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
+      }, 3000);
+    } else {
+      const newDayListMeal: ListProps = {
+        day: watchDate,
+        meals: [methods.getValues()],
+      };
+
+      const arr = [...mealList];
+
+      arr.push(newDayListMeal);
+
+      setMealList(arr);
+      setTimeout(() => {
+        setIsLoading(!isLoading);
+        navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
+      }, 3000);
+    }
   };
 
   const renderHeader = (): JSX.Element => (
@@ -185,7 +225,7 @@ function New(): JSX.Element {
                     keyboardType="numeric"
                     onChangeText={onChange}
                     value={value}
-                    maxLength={4}
+                    maxLength={5}
                   />
                 )}
               />
@@ -249,13 +289,28 @@ function New(): JSX.Element {
             fontFamily: Fonts.bold,
             color: Colors.white,
           }}
-          style={styles.submitButtonContainer}
+          style={[
+            styles.submitButtonContainer,
+            {
+              opacity: !dietOptionSelected ? 0.5 : 1,
+            },
+          ]}
+          disabled={!dietOptionSelected}
         />
       </FormProvider>
     </View>
   );
 
-  return (
+  return isLoading ? (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+      }}
+    >
+      <Loader />
+    </View>
+  ) : (
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={{
