@@ -15,9 +15,10 @@ function List(): JSX.Element {
   const navigation = useNavigation<NavigationProps>();
 
   const handleMeal = (item: MealProps): void => {
-    const { name, description, date, time, isPartOfDiet } = item;
+    const { id, name, description, date, time, isPartOfDiet } = item;
 
     navigation.navigate('Meal', {
+      id,
       name,
       description,
       date,

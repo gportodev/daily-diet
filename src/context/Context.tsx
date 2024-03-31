@@ -12,6 +12,7 @@ type MealProps = {
 };
 
 type ItemProps = {
+  id: number;
   name: string;
   date: string;
   time: string;
@@ -42,6 +43,7 @@ function MealProvider({ children }: MealProps): JSX.Element {
       day: '13/08/2022',
       meals: [
         {
+          id: 1,
           name: 'Sanduíche',
           date: '13/08/2022',
           time: '20:00',
@@ -50,6 +52,7 @@ function MealProvider({ children }: MealProps): JSX.Element {
           isPartOfDiet: false,
         },
         {
+          id: 2,
           name: 'Vitamina de banana',
           date: '13/08/2022',
           time: '09:30',
@@ -62,6 +65,7 @@ function MealProvider({ children }: MealProps): JSX.Element {
       day: '12/08/2022',
       meals: [
         {
+          id: 1,
           name: 'Whey',
           date: '12/08/2022',
           time: '16:00',
@@ -69,6 +73,7 @@ function MealProvider({ children }: MealProps): JSX.Element {
           isPartOfDiet: true,
         },
         {
+          id: 2,
           name: 'Salada cesar com frango',
           date: '12/08/2022',
           time: '12:30',
@@ -81,6 +86,7 @@ function MealProvider({ children }: MealProps): JSX.Element {
       day: '11/08/2022',
       meals: [
         {
+          id: 1,
           name: 'Whey',
           date: '11/08/2022',
           time: '16:00',
@@ -88,6 +94,7 @@ function MealProvider({ children }: MealProps): JSX.Element {
           isPartOfDiet: true,
         },
         {
+          id: 2,
           name: 'Salada cesar com frango',
           date: '11/08/2022',
           time: '12:30',

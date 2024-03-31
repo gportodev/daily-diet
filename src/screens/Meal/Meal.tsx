@@ -23,7 +23,7 @@ type ButtonProp = {
 
 function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   const { mealList, setMealList } = useMeal();
-  const { name, description, date, time, isPartOfDiet } = route.params;
+  const { id, name, description, date, time, isPartOfDiet } = route.params;
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,6 +31,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
 
   const methods = useForm({
     defaultValues: {
+      id,
       name,
       description,
       date,
@@ -39,19 +40,23 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     },
   });
 
+  const watchId = methods.watch('id');
   const watchName = methods.watch('name');
   const watchDate = methods.watch('date');
+  const watchIsPartOfDiet = methods.watch('isPartOfDiet');
 
   const [positiveButton, setPositiveButton] = useState<ButtonProp>({
-    active: false,
-    backgroundColor: Colors.grays.gray6,
-    borderColor: Colors.grays.gray1,
+    active: isPartOfDiet,
+    backgroundColor: isPartOfDiet
+      ? Colors.greens.greensLight
+      : Colors.grays.gray6,
+    borderColor: isPartOfDiet ? Colors.greens.greensDark : Colors.grays.gray1,
   });
 
   const [negativeButton, setNegativeButton] = useState<ButtonProp>({
-    active: false,
-    backgroundColor: Colors.grays.gray6,
-    borderColor: Colors.grays.gray1,
+    active: isPartOfDiet,
+    backgroundColor: !isPartOfDiet ? Colors.reds.redLight : Colors.grays.gray6,
+    borderColor: !isPartOfDiet ? Colors.reds.redDark : Colors.grays.gray1,
   });
 
   const handleDeleteMeal = (): void => {
@@ -63,24 +68,36 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
 
     const newDayListMeal = dayListMeal?.filter(item => item.name !== watchName);
 
-    const newMealList = mealList.map(item => {
-      if (item.day === watchDate) {
-        return {
-          day: item.day,
-          meals: newDayListMeal,
-        };
-      }
+    if (newDayListMeal?.length > 0) {
+      const newMealList = mealList.map(item => {
+        if (item.day === watchDate) {
+          return {
+            day: item.day,
+            meals: newDayListMeal,
+          };
+        }
 
-      return item;
-    });
+        return item;
+      });
 
-    setMealList(newMealList);
-    setModal(!modal);
+      setMealList(newMealList);
+      setModal(!modal);
 
-    setTimeout(() => {
-      setIsLoading(!isLoading);
-      navigation.navigate(`Home`);
-    }, 3000);
+      setTimeout(() => {
+        setIsLoading(!isLoading);
+        navigation.navigate(`Home`);
+      }, 3000);
+    } else {
+      const newMealList = mealList.filter(item => item.day !== watchDate);
+
+      setMealList(newMealList);
+      setModal(!modal);
+
+      setTimeout(() => {
+        setIsLoading(!isLoading);
+        navigation.navigate(`Home`);
+      }, 3000);
+    }
   };
 
   const buttons: ButtonProps[] = [
@@ -123,6 +140,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
         backgroundColor: Colors.grays.gray6,
         borderColor: Colors.grays.gray1,
       });
+      methods.setValue('isPartOfDiet', true);
     } else {
       setNegativeButton({
         active: true,
@@ -134,7 +152,42 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
         backgroundColor: Colors.grays.gray6,
         borderColor: Colors.grays.gray1,
       });
+      methods.setValue('isPartOfDiet', false);
     }
+  };
+
+  const handleEdit = (): void => {
+    setIsLoading(!isLoading);
+
+    const dayListMeal = mealList.find(item => {
+      return item.day === watchDate;
+    });
+
+    const updateDayListMeal = dayListMeal?.meals.map(item => {
+      if (item.id === watchId) {
+        const newMeal = methods.getValues();
+
+        return newMeal;
+      }
+
+      return item;
+    });
+
+    const updatedList = mealList.map(item => {
+      if (item.day === watchDate) {
+        return {
+          day: item.day,
+          meals: updateDayListMeal,
+        };
+      }
+      return item;
+    });
+
+    setMealList(updatedList);
+    setTimeout(() => {
+      setIsLoading(!isLoading);
+      navigation.navigate(`Home`);
+    }, 3000);
   };
 
   const handleGoBack = (): void => {
@@ -337,15 +390,13 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
             <View style={styles.tag}>
               <Circle
                 color={
-                  methods.getValues('isPartOfDiet')
+                  watchIsPartOfDiet
                     ? Colors.greens.greensDark
                     : Colors.reds.redDark
                 }
               />
               <Text>
-                {methods.getValues('isPartOfDiet')
-                  ? 'dentro da dieta'
-                  : 'fora da dieta'}
+                {watchIsPartOfDiet ? 'dentro da dieta' : 'fora da dieta'}
               </Text>
             </View>
           )}
@@ -355,9 +406,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
           {editable ? (
             <>
               <Button
-                onPress={() => {
-                  setEditable(false);
-                }}
+                onPress={handleEdit}
                 title="Salvar alterações"
                 titleStyle={{
                   fontSize: 14,
