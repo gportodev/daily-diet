@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import styles from './styles';
 import { Fonts } from '../../constants/Fonts';
@@ -26,10 +26,24 @@ function List(): JSX.Element {
     });
   };
 
+  const convertDate = (date: string): string =>
+    date.split('/').reverse().join('-');
+
+  const sortedList = useMemo(() => {
+    const sortedDates = mealList.sort((a, b) => {
+      const dateA = new Date(convertDate(a.day));
+      const dateB = new Date(convertDate(b.day));
+
+      return dateB - dateA;
+    });
+
+    return sortedDates;
+  }, [mealList]);
+
   return (
     <>
       <FlatList
-        data={mealList}
+        data={sortedList}
         scrollEnabled={false}
         renderItem={({ item }) => (
           <>
@@ -46,7 +60,7 @@ function List(): JSX.Element {
                   lineHeight: 23.4,
                 }}
               >
-                {item.day}
+                {item.day.split('/').join('.')}
               </Text>
             </View>
 
