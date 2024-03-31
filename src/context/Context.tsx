@@ -19,7 +19,7 @@ type ItemProps = {
   isPartOfDiet: boolean;
 };
 
-type ListProps = {
+export type ListProps = {
   day: string;
   meals: ItemProps[];
 };
@@ -39,11 +39,11 @@ const MealContext = createContext(defaultValue);
 function MealProvider({ children }: MealProps): JSX.Element {
   const [mealList, setMealList] = useState<ListProps[]>([
     {
-      day: '12/08/2022',
+      day: '13/08/2022',
       meals: [
         {
           name: 'Sanduíche',
-          date: '12/08/2022',
+          date: '13/08/2022',
           time: '20:00',
           description:
             'Sanduíche de pão integral com atum e salada de alface e tomate',
@@ -51,7 +51,7 @@ function MealProvider({ children }: MealProps): JSX.Element {
         },
         {
           name: 'Vitamina de banana',
-          date: '12/08/2022',
+          date: '13/08/2022',
           time: '09:30',
           description: 'Vitamina de banana',
           isPartOfDiet: true,
@@ -59,18 +59,37 @@ function MealProvider({ children }: MealProps): JSX.Element {
       ],
     },
     {
-      day: '13/08/2022',
+      day: '12/08/2022',
       meals: [
         {
           name: 'Whey',
-          date: '13/08/2022',
+          date: '12/08/2022',
           time: '16:00',
           description: 'Whey',
           isPartOfDiet: true,
         },
         {
           name: 'Salada cesar com frango',
-          date: '13/08/2022',
+          date: '12/08/2022',
+          time: '12:30',
+          description: 'Salada cesar com frango',
+          isPartOfDiet: true,
+        },
+      ],
+    },
+    {
+      day: '11/08/2022',
+      meals: [
+        {
+          name: 'Whey',
+          date: '11/08/2022',
+          time: '16:00',
+          description: 'Whey',
+          isPartOfDiet: true,
+        },
+        {
+          name: 'Salada cesar com frango',
+          date: '11/08/2022',
           time: '12:30',
           description: 'Salada cesar com frango',
           isPartOfDiet: true,
