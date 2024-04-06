@@ -12,14 +12,8 @@ import { StackScreenProps } from '../../routes/types';
 import { ArrowLeft, PencilSimpleLine, Trash } from 'phosphor-react-native';
 import { DeleteModal } from '../../components/DeleteModal';
 import { ButtonProps } from '../../components/Button/types';
-import { useMeal } from '../../context/Context';
+import { ListProps, useMeal } from '../../context/Context';
 import { Loader } from '../../components/Loader/Loader';
-
-type ButtonProp = {
-  active: boolean;
-  backgroundColor: string;
-  borderColor: string;
-};
 
 function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   const { mealList, setMealList } = useMeal();
@@ -44,20 +38,6 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   const watchName = methods.watch('name');
   const watchDate = methods.watch('date');
   const watchIsPartOfDiet = methods.watch('isPartOfDiet');
-
-  const [positiveButton, setPositiveButton] = useState<ButtonProp>({
-    active: isPartOfDiet,
-    backgroundColor: isPartOfDiet
-      ? Colors.greens.greensLight
-      : Colors.grays.gray6,
-    borderColor: isPartOfDiet ? Colors.greens.greensDark : Colors.grays.gray1,
-  });
-
-  const [negativeButton, setNegativeButton] = useState<ButtonProp>({
-    active: isPartOfDiet,
-    backgroundColor: !isPartOfDiet ? Colors.reds.redLight : Colors.grays.gray6,
-    borderColor: !isPartOfDiet ? Colors.reds.redDark : Colors.grays.gray1,
-  });
 
   const handleDeleteMeal = (): void => {
     setIsLoading(!isLoading);
@@ -128,62 +108,71 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     },
   ];
 
-  const handleRegister = (value: string): void => {
-    if (value === 'positive') {
-      setPositiveButton({
-        active: true,
-        backgroundColor: Colors.greens.greensLight,
-        borderColor: Colors.greens.greensDark,
-      });
-      setNegativeButton({
-        active: false,
-        backgroundColor: Colors.grays.gray6,
-        borderColor: Colors.grays.gray1,
-      });
-      methods.setValue('isPartOfDiet', true);
-    } else {
-      setNegativeButton({
-        active: true,
-        backgroundColor: Colors.reds.redLight,
-        borderColor: Colors.reds.redDark,
-      });
-      setPositiveButton({
-        active: false,
-        backgroundColor: Colors.grays.gray6,
-        borderColor: Colors.grays.gray1,
-      });
-      methods.setValue('isPartOfDiet', false);
-    }
-  };
-
   const handleEdit = (): void => {
     setIsLoading(!isLoading);
 
-    const dayListMeal = mealList.find(item => {
-      return item.day === watchDate;
-    });
+    const findPreviousItemList = mealList.find(item => item.day === date);
 
-    const updateDayListMeal = dayListMeal?.meals.map(item => {
-      if (item.id === watchId) {
-        const newMeal = methods.getValues();
+    const dayListMeal = mealList.find(item => item.day === watchDate);
 
-        return newMeal;
-      }
+    if (!dayListMeal) {
+      const newDayListMeal: ListProps = {
+        day: watchDate,
+        meals: [methods.getValues()],
+      };
 
-      return item;
-    });
+      const arr = [...mealList];
 
-    const updatedList = mealList.map(item => {
-      if (item.day === watchDate) {
-        return {
-          day: item.day,
-          meals: updateDayListMeal,
+      arr.push(newDayListMeal);
+
+      setMealList(arr);
+    } else {
+      if (date !== watchDate && findPreviousItemList) {
+        const filteredList = findPreviousItemList.meals.filter(
+          item => item.id !== watchId,
+        );
+
+        const newPreviousList = {
+          day: date,
+          meals: filteredList,
         };
-      }
-      return item;
-    });
 
-    setMealList(updatedList);
+        const editedItem = methods.getValues();
+
+        dayListMeal.meals.push(editedItem);
+
+        const updatedList = mealList.map(item => {
+          if (item.day === date) {
+            return newPreviousList;
+          }
+
+          return item;
+        });
+
+        setMealList(updatedList.filter(item => item.meals.length > 0));
+      } else {
+        const updateDayListMeal = dayListMeal.meals.map(item => {
+          if (item.id === watchId) {
+            const newMeal = methods.getValues();
+            return newMeal;
+          }
+          return item;
+        });
+
+        const updatedList = mealList.map(item => {
+          if (item.day === watchDate) {
+            return {
+              day: item.day,
+              meals: updateDayListMeal,
+            };
+          }
+          return item;
+        });
+
+        setMealList(updatedList);
+      }
+    }
+
     setTimeout(() => {
       setIsLoading(!isLoading);
       navigation.navigate(`Home`);
@@ -220,6 +209,43 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
       </View>
     </View>
   );
+
+  const isPartOfTheDietbuttons = [
+    {
+      title: 'Sim',
+      active: watchIsPartOfDiet,
+      iconColor: Colors.greens.greensDark,
+      style: {
+        backgroundColor: watchIsPartOfDiet
+          ? Colors.greens.greensLight
+          : Colors.grays.gray6,
+        borderColor: watchIsPartOfDiet
+          ? Colors.greens.greensDark
+          : Colors.grays.gray1,
+      },
+    },
+    {
+      title: 'Não',
+      active: !watchIsPartOfDiet,
+      iconColor: Colors.reds.redDark,
+      style: {
+        backgroundColor: !watchIsPartOfDiet
+          ? Colors.reds.redLight
+          : Colors.grays.gray6,
+        borderColor: !watchIsPartOfDiet
+          ? Colors.reds.redDark
+          : Colors.grays.gray1,
+      },
+    },
+  ];
+
+  const handleDiet = (button: string): void => {
+    if (button === 'Sim') {
+      methods.setValue('isPartOfDiet', true);
+    } else {
+      methods.setValue('isPartOfDiet', false);
+    }
+  };
 
   const renderContent = (): JSX.Element => (
     <View style={styles.content}>
@@ -351,39 +377,27 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                   height: 70,
                 }}
               >
-                <Button
-                  disabled={positiveButton.active}
-                  onPress={() => {
-                    handleRegister('positive');
-                  }}
-                  title="Sim"
-                  titleStyle={{
-                    fontSize: 14,
-                    lineHeight: 18.2,
-                    fontFamily: Fonts.bold,
-                    color: Colors.grays.gray1,
-                  }}
-                  style={[styles.validateButtonContainer, positiveButton]}
-                >
-                  <Circle color={Colors.greens.greensDark} />
-                </Button>
-
-                <Button
-                  disabled={negativeButton.active}
-                  onPress={() => {
-                    handleRegister('negative');
-                  }}
-                  title="Não"
-                  titleStyle={{
-                    fontSize: 14,
-                    lineHeight: 18.2,
-                    fontFamily: Fonts.bold,
-                    color: Colors.grays.gray1,
-                  }}
-                  style={[styles.validateButtonContainer, negativeButton]}
-                >
-                  <Circle color={Colors.reds.redDark} />
-                </Button>
+                {isPartOfTheDietbuttons.map(button => {
+                  return (
+                    <Button
+                      key={button.title}
+                      disabled={button.active}
+                      onPress={() => {
+                        handleDiet(button.title);
+                      }}
+                      title={button.title}
+                      titleStyle={{
+                        fontSize: 14,
+                        lineHeight: 18.2,
+                        fontFamily: Fonts.bold,
+                        color: Colors.grays.gray1,
+                      }}
+                      style={[styles.validateButtonContainer, button.style]}
+                    >
+                      <Circle color={button.iconColor} />
+                    </Button>
+                  );
+                })}
               </View>
             </View>
           ) : (

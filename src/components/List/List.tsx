@@ -6,15 +6,14 @@ import { Circle, Divider } from '../../assets/Loader';
 import Colors from '../../constants/Colors';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProps } from '../../routes/types';
-import { MealProps } from '../../screens/Home/types';
-import { useMeal } from '../../context/Context';
+import { ItemProps, useMeal } from '../../context/Context';
 
 function List(): JSX.Element {
   const { mealList } = useMeal();
 
   const navigation = useNavigation<NavigationProps>();
 
-  const handleMeal = (item: MealProps): void => {
+  const handleMeal = (item: ItemProps): void => {
     const { id, name, description, date, time, isPartOfDiet } = item;
 
     navigation.navigate('Meal', {
