@@ -92,6 +92,7 @@ function New(): JSX.Element {
     });
 
     if (dayListMeal) {
+      // add new item to an existing list meal
       const newMeal = methods.getValues();
 
       dayListMeal.meals.push(newMeal);
@@ -99,11 +100,8 @@ function New(): JSX.Element {
       const arr = [...mealList];
 
       setMealList(arr);
-      setTimeout(() => {
-        setIsLoading(!isLoading);
-        navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
-      }, 3000);
     } else {
+      // add item to a new list meal
       const newDayListMeal: ListProps = {
         day: watchDate,
         meals: [methods.getValues()],
@@ -114,11 +112,12 @@ function New(): JSX.Element {
       arr.push(newDayListMeal);
 
       setMealList(arr);
-      setTimeout(() => {
-        setIsLoading(!isLoading);
-        navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
-      }, 3000);
     }
+
+    setTimeout(() => {
+      setIsLoading(!isLoading);
+      navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
+    }, 3000);
   };
 
   const renderHeader = (): JSX.Element => (
@@ -206,7 +205,7 @@ function New(): JSX.Element {
                   <Input
                     title="Data"
                     style={styles.inputDatetime}
-                    keyboardType="numeric"
+                    // keyboardType="numeric"
                     onChangeText={onChange}
                     value={value}
                     maxLength={10}
@@ -222,7 +221,7 @@ function New(): JSX.Element {
                   <Input
                     title="Hora"
                     style={styles.inputDatetime}
-                    keyboardType="numeric"
+                    // keyboardType="numeric"
                     onChangeText={onChange}
                     value={value}
                     maxLength={5}
@@ -295,7 +294,8 @@ function New(): JSX.Element {
               opacity: !dietOptionSelected ? 0.5 : 1,
             },
           ]}
-          disabled={!dietOptionSelected}
+          // disabled={!dietOptionSelected && !methods.formState.isDirty}
+          disabled={!methods.formState.isDirty}
         />
       </FormProvider>
     </View>

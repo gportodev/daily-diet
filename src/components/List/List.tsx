@@ -13,6 +13,8 @@ function List(): JSX.Element {
 
   const navigation = useNavigation<NavigationProps>();
 
+  console.log(JSON.stringify(mealList, undefined, 2));
+
   const handleMeal = (item: ItemProps): void => {
     const { id, name, description, date, time, isPartOfDiet } = item;
 

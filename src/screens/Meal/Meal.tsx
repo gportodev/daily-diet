@@ -39,47 +39,6 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   const watchDate = methods.watch('date');
   const watchIsPartOfDiet = methods.watch('isPartOfDiet');
 
-  const handleDeleteMeal = (): void => {
-    setIsLoading(!isLoading);
-
-    const dayListMeal = mealList.find(item => {
-      return item.day === watchDate;
-    })?.meals;
-
-    const newDayListMeal = dayListMeal?.filter(item => item.name !== watchName);
-
-    if (newDayListMeal?.length > 0) {
-      const newMealList = mealList.map(item => {
-        if (item.day === watchDate) {
-          return {
-            day: item.day,
-            meals: newDayListMeal,
-          };
-        }
-
-        return item;
-      });
-
-      setMealList(newMealList);
-      setModal(!modal);
-
-      setTimeout(() => {
-        setIsLoading(!isLoading);
-        navigation.navigate(`Home`);
-      }, 3000);
-    } else {
-      const newMealList = mealList.filter(item => item.day !== watchDate);
-
-      setMealList(newMealList);
-      setModal(!modal);
-
-      setTimeout(() => {
-        setIsLoading(!isLoading);
-        navigation.navigate(`Home`);
-      }, 3000);
-    }
-  };
-
   const buttons: ButtonProps[] = [
     {
       title: 'Cancelar',
@@ -115,7 +74,17 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
 
     const dayListMeal = mealList.find(item => item.day === watchDate);
 
-    if (!dayListMeal) {
+    if (!dayListMeal && findPreviousItemList) {
+      console.log('CENÁRIO: Nova data');
+      const filteredList = findPreviousItemList.meals.filter(
+        item => item.id !== watchId,
+      );
+
+      const newPreviousList = {
+        day: date,
+        meals: filteredList,
+      };
+
       const newDayListMeal: ListProps = {
         day: watchDate,
         meals: [methods.getValues()],
@@ -125,9 +94,22 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
 
       arr.push(newDayListMeal);
 
-      setMealList(arr);
+      const updatedList = arr.map(item => {
+        if (item.day === date) {
+          return newPreviousList;
+        }
+
+        return item;
+      });
+
+      const listWithMeals = updatedList.filter(item => item.meals.length > 0);
+
+      setMealList(listWithMeals);
     } else {
-      if (date !== watchDate && findPreviousItemList) {
+      // update the item props changing the date to a existing one
+      console.log('CENÁRIO: data existente');
+
+      if (date !== watchDate && findPreviousItemList && dayListMeal) {
         const filteredList = findPreviousItemList.meals.filter(
           item => item.id !== watchId,
         );
@@ -149,8 +131,13 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
           return item;
         });
 
-        setMealList(updatedList.filter(item => item.meals.length > 0));
-      } else {
+        const listWithMeals = updatedList.filter(item => item.meals.length > 0);
+
+        setMealList(listWithMeals);
+      } else if (dayListMeal) {
+        console.log('CENÁRIO: data existente mas sem mexer na data');
+
+        // update item props but not the date
         const updateDayListMeal = dayListMeal.meals.map(item => {
           if (item.id === watchId) {
             const newMeal = methods.getValues();
@@ -177,6 +164,47 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
       setIsLoading(!isLoading);
       navigation.navigate(`Home`);
     }, 3000);
+  };
+
+  const handleDeleteMeal = (): void => {
+    setIsLoading(!isLoading);
+
+    const dayListMeal = mealList.find(item => {
+      return item.day === watchDate;
+    })?.meals;
+
+    const newDayListMeal = dayListMeal?.filter(item => item.name !== watchName);
+
+    if (newDayListMeal && newDayListMeal.length > 0) {
+      const newMealList = mealList.map(item => {
+        if (item.day === watchDate) {
+          return {
+            day: item.day,
+            meals: newDayListMeal,
+          };
+        }
+
+        return item;
+      });
+
+      setMealList(newMealList);
+      setModal(!modal);
+
+      setTimeout(() => {
+        setIsLoading(!isLoading);
+        navigation.navigate(`Home`);
+      }, 3000);
+    } else {
+      const newMealList = mealList.filter(item => item.day !== watchDate);
+
+      setMealList(newMealList);
+      setModal(!modal);
+
+      setTimeout(() => {
+        setIsLoading(!isLoading);
+        navigation.navigate(`Home`);
+      }, 3000);
+    }
   };
 
   const handleGoBack = (): void => {
@@ -328,7 +356,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                       editable={editable}
                       title="Data"
                       style={styles.inputDatetime}
-                      keyboardType="numeric"
+                      // keyboardType="numeric"
                       onChangeText={onChange}
                       value={value}
                       maxLength={10}
@@ -345,7 +373,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                       editable={editable}
                       title="Hora"
                       style={styles.inputDatetime}
-                      keyboardType="numeric"
+                      // keyboardType="numeric"
                       onChangeText={onChange}
                       value={value}
                     />
