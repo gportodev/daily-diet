@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Input } from '../../components/Input';
 import styles from './styles';
@@ -9,9 +13,9 @@ import { Circle } from '../../assets/Loader';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProps } from '../../routes/types';
 import { ArrowLeft } from 'phosphor-react-native';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { ListProps, useMeal } from '../../context/Context';
+import { ItemProps, ListProps, useMeal } from '../../context/Context';
 import { Loader } from '../../components/Loader/Loader';
+import { schema } from '../Home/helpers';
 
 type ButtonProp = {
   active: boolean;
@@ -35,7 +39,7 @@ function New(): JSX.Element {
     borderColor: Colors.grays.gray1,
   });
 
-  const methods = useForm({
+  const methods = useForm<ItemProps>({
     defaultValues: {
       name: '',
       description: '',
@@ -43,6 +47,8 @@ function New(): JSX.Element {
       time: '',
       isPartOfDiet: false,
     },
+    resolver: yupResolver(schema),
+    // mode: 'onChange',
   });
 
   const watchDate = methods.watch('date');
@@ -51,6 +57,13 @@ function New(): JSX.Element {
   const dietOptionSelected = positiveButton.active || negativeButton.active;
 
   const navigation = useNavigation<NavigationProps>();
+
+  console.log(
+    'Errors: ' + JSON.stringify(methods.formState.errors, undefined, 2),
+  );
+  console.log(
+    'IsDirty: ' + JSON.stringify(methods.formState.isDirty, undefined, 2),
+  );
 
   const handleOption = (value: string): void => {
     if (value === 'positive') {
@@ -85,39 +98,39 @@ function New(): JSX.Element {
   };
 
   const handleNewMeal = (): void => {
-    setIsLoading(!isLoading);
+    // setIsLoading(!isLoading);
 
     const dayListMeal = mealList.find(item => {
       return item.day === watchDate;
     });
 
-    if (dayListMeal) {
-      // add new item to an existing list meal
-      const newMeal = methods.getValues();
+    // if (dayListMeal) {
+    //   // add new item to an existing list meal
+    //   const newMeal = methods.getValues();
 
-      dayListMeal.meals.push(newMeal);
+    //   dayListMeal.meals.push(newMeal);
 
-      const arr = [...mealList];
+    //   const arr = [...mealList];
 
-      setMealList(arr);
-    } else {
-      // add item to a new list meal
-      const newDayListMeal: ListProps = {
-        day: watchDate,
-        meals: [methods.getValues()],
-      };
+    //   setMealList(arr);
+    // } else {
+    //   // add item to a new list meal
+    //   const newDayListMeal: ListProps = {
+    //     day: watchDate,
+    //     meals: [methods.getValues()],
+    //   };
 
-      const arr = [...mealList];
+    //   const arr = [...mealList];
 
-      arr.push(newDayListMeal);
+    //   arr.push(newDayListMeal);
 
-      setMealList(arr);
-    }
+    //   setMealList(arr);
+    // }
 
-    setTimeout(() => {
-      setIsLoading(!isLoading);
-      navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
-    }, 3000);
+    // setTimeout(() => {
+    //   setIsLoading(!isLoading);
+    //   navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
+    // }, 3000);
   };
 
   const renderHeader = (): JSX.Element => (
@@ -294,7 +307,6 @@ function New(): JSX.Element {
               opacity: !dietOptionSelected ? 0.5 : 1,
             },
           ]}
-          // disabled={!dietOptionSelected && !methods.formState.isDirty}
           disabled={!methods.formState.isDirty}
         />
       </FormProvider>
