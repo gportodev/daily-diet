@@ -5,6 +5,8 @@ import React, {
   Dispatch,
   SetStateAction,
   useContext,
+  useEffect,
+  useCallback,
 } from 'react';
 
 import uuid from 'react-native-uuid';
@@ -30,11 +32,17 @@ export type ListProps = {
 type MealContextList = {
   mealList: ListProps[];
   setMealList: Dispatch<SetStateAction<ListProps[]>>;
+  mealsStatistics: number;
+  allMeals: number;
+  mealsInDiet: number;
 };
 
 const defaultValue: MealContextList = {
   mealList: [],
   setMealList: () => {},
+  mealsStatistics: 0,
+  allMeals: 0,
+  mealsInDiet: 0,
 };
 
 const MealContext = createContext(defaultValue);
@@ -106,9 +114,39 @@ function MealProvider({ children }: MealProps): JSX.Element {
       ],
     },
   ]);
+  const [mealsStatistics, setMealsStatistics] = useState(0);
+  const [allMeals, setAllMeals] = useState(0);
+  const [mealsInDiet, setMealsInDiet] = useState(0);
+
+  const handleDietStatistics = useCallback(() => {
+    let allMealsCounter = 0;
+    let inDietMealsCounter = 0;
+
+    mealList.forEach(item => {
+      const dietItems = item.meals.filter(item => item.isPartOfDiet).length;
+
+      allMealsCounter = allMealsCounter + item.meals.length;
+
+      inDietMealsCounter = inDietMealsCounter + dietItems;
+    });
+
+    const statisticNumber = Number(
+      ((inDietMealsCounter * 100) / allMealsCounter).toFixed(2),
+    );
+
+    setAllMeals(allMealsCounter);
+    setMealsInDiet(inDietMealsCounter);
+    setMealsStatistics(statisticNumber);
+  }, [mealList]);
+
+  useEffect(() => {
+    handleDietStatistics();
+  }, [handleDietStatistics, mealList]);
 
   return (
-    <MealContext.Provider value={{ mealList, setMealList }}>
+    <MealContext.Provider
+      value={{ mealList, setMealList, mealsStatistics, allMeals, mealsInDiet }}
+    >
       {children}
     </MealContext.Provider>
   );

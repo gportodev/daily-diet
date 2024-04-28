@@ -6,25 +6,27 @@ import { useRoute } from '@react-navigation/native';
 import Colors from '../../constants/Colors';
 import { Fonts } from '../../constants/Fonts';
 import { getArrowStatus, getCardStatus } from '../Home/helpers';
+import { useMeal } from '../../context/Context';
 
 function Statistics(): JSX.Element {
+  const { allMeals, mealsInDiet } = useMeal();
   const route = useRoute();
 
   const { value, text } = route.params as StatisticsProps;
 
   const list = [
+    // {
+    //   value: 22,
+    //   description: 'melhor sequência de pratos dentro da dieta',
+    //   style: {
+    //     height: 89,
+    //     backgroundColor: Colors.grays.gray6,
+    //     padding: 16,
+    //     borderRadius: 8,
+    //   },
+    // },
     {
-      value: 22,
-      description: 'melhor sequência de pratos dentro da dieta',
-      style: {
-        height: 89,
-        backgroundColor: Colors.grays.gray6,
-        padding: 16,
-        borderRadius: 8,
-      },
-    },
-    {
-      value: 109,
+      value: allMeals,
       description: 'refeições registradas',
       style: {
         height: 89,
@@ -37,7 +39,7 @@ function Statistics(): JSX.Element {
 
   const subList: Item[] = [
     {
-      value: 99,
+      value: mealsInDiet,
       description: 'refeições dentro da dieta',
       style: {
         width: '48%',
@@ -49,7 +51,7 @@ function Statistics(): JSX.Element {
       },
     },
     {
-      value: 10,
+      value: allMeals - mealsInDiet,
       description: 'refeições fora da dieta',
       style: {
         width: '48%',

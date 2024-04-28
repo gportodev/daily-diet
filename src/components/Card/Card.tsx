@@ -51,7 +51,7 @@ function Card({
 
       <View style={styles.wrapper}>
         <Text style={numberStyle}>
-          {value?.toString() + (percent ? '%' : '')}
+          {value?.toString().replace('.', ',') + (percent ? '%' : '')}
         </Text>
         <Text style={textStyle}>{text}</Text>
       </View>
