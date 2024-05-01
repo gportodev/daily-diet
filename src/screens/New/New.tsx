@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -48,21 +48,17 @@ function New(): JSX.Element {
       isPartOfDiet: false,
     },
     resolver: yupResolver(schema),
-    // mode: 'onChange',
+    mode: 'onChange',
   });
 
   const watchDate = methods.watch('date');
   const watchIsPartOfDiet = methods.watch('isPartOfDiet');
 
-  const dietOptionSelected = positiveButton.active || negativeButton.active;
-
   const navigation = useNavigation<NavigationProps>();
 
-  console.log(
-    'Errors: ' + JSON.stringify(methods.formState.errors, undefined, 2),
-  );
-  console.log(
-    'IsDirty: ' + JSON.stringify(methods.formState.isDirty, undefined, 2),
+  const isSubmitDisabled = useMemo(
+    () => !methods.formState.isDirty || !methods.formState.isValid,
+    [methods.formState.isDirty, methods.formState.isValid],
   );
 
   const handleOption = (value: string): void => {
@@ -98,39 +94,39 @@ function New(): JSX.Element {
   };
 
   const handleNewMeal = (): void => {
-    // setIsLoading(!isLoading);
+    setIsLoading(!isLoading);
 
     const dayListMeal = mealList.find(item => {
       return item.day === watchDate;
     });
 
-    // if (dayListMeal) {
-    //   // add new item to an existing list meal
-    //   const newMeal = methods.getValues();
+    if (dayListMeal) {
+      // add new item to an existing list meal
+      const newMeal = methods.getValues();
 
-    //   dayListMeal.meals.push(newMeal);
+      dayListMeal.meals.push(newMeal);
 
-    //   const arr = [...mealList];
+      const arr = [...mealList];
 
-    //   setMealList(arr);
-    // } else {
-    //   // add item to a new list meal
-    //   const newDayListMeal: ListProps = {
-    //     day: watchDate,
-    //     meals: [methods.getValues()],
-    //   };
+      setMealList(arr);
+    } else {
+      // add item to a new list meal
+      const newDayListMeal: ListProps = {
+        day: watchDate,
+        meals: [methods.getValues()],
+      };
 
-    //   const arr = [...mealList];
+      const arr = [...mealList];
 
-    //   arr.push(newDayListMeal);
+      arr.push(newDayListMeal);
 
-    //   setMealList(arr);
-    // }
+      setMealList(arr);
+    }
 
-    // setTimeout(() => {
-    //   setIsLoading(!isLoading);
-    //   navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
-    // }, 3000);
+    setTimeout(() => {
+      setIsLoading(!isLoading);
+      navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
+    }, 3000);
   };
 
   const renderHeader = (): JSX.Element => (
@@ -165,7 +161,7 @@ function New(): JSX.Element {
         <View>
           <Controller
             name="name"
-            render={({ field: { onChange, value } }) => (
+            render={({ field, fieldState }) => (
               <Input
                 title="Nome"
                 titleStyle={{
@@ -173,21 +169,27 @@ function New(): JSX.Element {
                   lineHeight: 26,
                 }}
                 style={styles.inputText}
-                onChangeText={onChange}
-                value={value}
+                {...{ ...field, ...fieldState }}
               />
             )}
           />
+          {methods.formState.errors.name && (
+            <Text
+              style={{
+                color: Colors.reds.redDark,
+              }}
+            >
+              {methods.formState.errors.name.message}
+            </Text>
+          )}
         </View>
 
         <View>
           <Controller
             name="description"
-            render={({ field: { onChange, value } }) => (
+            render={({ field, fieldState }) => (
               <Input
                 title="Descrição"
-                onChangeText={onChange}
-                value={value}
                 style={[
                   styles.inputText,
                   {
@@ -197,9 +199,19 @@ function New(): JSX.Element {
                 ]}
                 multiline
                 maxLength={150}
+                {...{ ...field, ...fieldState }}
               />
             )}
           />
+          {methods.formState.errors.description && (
+            <Text
+              style={{
+                color: Colors.reds.redDark,
+              }}
+            >
+              {methods.formState.errors.description.message}
+            </Text>
+          )}
         </View>
 
         <View>
@@ -214,33 +226,49 @@ function New(): JSX.Element {
             <View>
               <Controller
                 name="date"
-                render={({ field: { onChange, value } }) => (
+                render={({ field, fieldState }) => (
                   <Input
+                    masked
+                    maskedType="99/99/9999"
                     title="Data"
                     style={styles.inputDatetime}
-                    // keyboardType="numeric"
-                    onChangeText={onChange}
-                    value={value}
-                    maxLength={10}
+                    {...{ ...field, ...fieldState }}
                   />
                 )}
               />
+              {methods.formState.errors.date && (
+                <Text
+                  style={{
+                    color: Colors.reds.redDark,
+                  }}
+                >
+                  {methods.formState.errors.date.message}
+                </Text>
+              )}
             </View>
 
             <View>
               <Controller
                 name="time"
-                render={({ field: { onChange, value } }) => (
+                render={({ field, fieldState }) => (
                   <Input
+                    masked
+                    maskedType="99:99"
                     title="Hora"
                     style={styles.inputDatetime}
-                    // keyboardType="numeric"
-                    onChangeText={onChange}
-                    value={value}
-                    maxLength={5}
+                    {...{ ...field, ...fieldState }}
                   />
                 )}
               />
+              {methods.formState.errors.time && (
+                <Text
+                  style={{
+                    color: Colors.reds.redDark,
+                  }}
+                >
+                  {methods.formState.errors.time.message}
+                </Text>
+              )}
             </View>
           </View>
         </View>
@@ -304,10 +332,10 @@ function New(): JSX.Element {
           style={[
             styles.submitButtonContainer,
             {
-              opacity: !dietOptionSelected ? 0.5 : 1,
+              opacity: isSubmitDisabled ? 0.5 : 1,
             },
           ]}
-          disabled={!methods.formState.isDirty}
+          disabled={isSubmitDisabled}
         />
       </FormProvider>
     </View>

@@ -1,8 +1,13 @@
+import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form';
 import { TextStyle, type TextInputProps } from 'react-native';
 
-type InputProps = TextInputProps & {
-  title?: string;
-  titleStyle?: TextStyle;
-};
+type InputProps = TextInputProps &
+  ControllerFieldState &
+  ControllerRenderProps & {
+    masked?: boolean;
+    maskedType?: string;
+    title?: string;
+    titleStyle?: TextStyle;
+  };
 
 export { InputProps };
