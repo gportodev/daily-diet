@@ -70,4 +70,8 @@ export default StyleSheet.create({
     borderRadius: 6,
     backgroundColor: Colors.grays.gray2,
   },
+  error: {
+    fontSize: 12,
+    color: Colors.reds.redDark,
+  },
 });

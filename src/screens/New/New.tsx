@@ -16,6 +16,7 @@ import { ArrowLeft } from 'phosphor-react-native';
 import { ItemProps, ListProps, useMeal } from '../../context/Context';
 import { Loader } from '../../components/Loader/Loader';
 import { schema } from '../Home/helpers';
+import { ValidationMessage } from '../../components/ValidationMessage';
 
 type ButtonProp = {
   active: boolean;
@@ -56,9 +57,14 @@ function New(): JSX.Element {
 
   const navigation = useNavigation<NavigationProps>();
 
+  const dietOptionSelected = positiveButton || negativeButton;
+
   const isSubmitDisabled = useMemo(
-    () => !methods.formState.isDirty || !methods.formState.isValid,
-    [methods.formState.isDirty, methods.formState.isValid],
+    () =>
+      !methods.formState.isDirty ||
+      !methods.formState.isValid ||
+      !dietOptionSelected,
+    [dietOptionSelected, methods.formState.isDirty, methods.formState.isValid],
   );
 
   const handleOption = (value: string): void => {
@@ -173,15 +179,7 @@ function New(): JSX.Element {
               />
             )}
           />
-          {methods.formState.errors.name && (
-            <Text
-              style={{
-                color: Colors.reds.redDark,
-              }}
-            >
-              {methods.formState.errors.name.message}
-            </Text>
-          )}
+          <ValidationMessage error={methods.formState.errors.name} />
         </View>
 
         <View>
@@ -203,15 +201,7 @@ function New(): JSX.Element {
               />
             )}
           />
-          {methods.formState.errors.description && (
-            <Text
-              style={{
-                color: Colors.reds.redDark,
-              }}
-            >
-              {methods.formState.errors.description.message}
-            </Text>
-          )}
+          <ValidationMessage error={methods.formState.errors.description} />
         </View>
 
         <View>
@@ -236,15 +226,7 @@ function New(): JSX.Element {
                   />
                 )}
               />
-              {methods.formState.errors.date && (
-                <Text
-                  style={{
-                    color: Colors.reds.redDark,
-                  }}
-                >
-                  {methods.formState.errors.date.message}
-                </Text>
-              )}
+              <ValidationMessage error={methods.formState.errors.date} />
             </View>
 
             <View>
@@ -260,15 +242,7 @@ function New(): JSX.Element {
                   />
                 )}
               />
-              {methods.formState.errors.time && (
-                <Text
-                  style={{
-                    color: Colors.reds.redDark,
-                  }}
-                >
-                  {methods.formState.errors.time.message}
-                </Text>
-              )}
+              <ValidationMessage error={methods.formState.errors.time} />
             </View>
           </View>
         </View>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Input } from '../../components/Input';
@@ -14,6 +14,8 @@ import { DeleteModal } from '../../components/DeleteModal';
 import { ButtonProps } from '../../components/Button/types';
 import { ListProps, useMeal } from '../../context/Context';
 import { Loader } from '../../components/Loader/Loader';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { schema } from '../Home/helpers';
 
 function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   const { mealList, setMealList } = useMeal();
@@ -32,6 +34,8 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
       time,
       isPartOfDiet,
     },
+    resolver: yupResolver(schema),
+    mode: 'onChange',
   });
 
   const watchId = methods.watch('id');
@@ -107,7 +111,6 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
       setMealList(listWithMeals);
     } else {
       // update the item props changing the date to a existing one
-      console.log('CENÁRIO: data existente');
 
       if (date !== watchDate && findPreviousItemList && dayListMeal) {
         const filteredList = findPreviousItemList.meals.filter(
@@ -135,8 +138,6 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
 
         setMealList(listWithMeals);
       } else if (dayListMeal) {
-        console.log('CENÁRIO: data existente mas sem mexer na data');
-
         // update item props but not the date
         const updateDayListMeal = dayListMeal.meals.map(item => {
           if (item.id === watchId) {
@@ -275,6 +276,11 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     }
   };
 
+  const isSubmitDisabled = useMemo(
+    () => !methods.formState.isDirty || !methods.formState.isValid,
+    [methods.formState.isDirty, methods.formState.isValid],
+  );
+
   const renderContent = (): JSX.Element => (
     <View style={styles.content}>
       <FormProvider {...methods}>
@@ -282,7 +288,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
           {editable ? (
             <Controller
               name="name"
-              render={({ field: { onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <Input
                   editable={editable}
                   title="Nome"
@@ -291,8 +297,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                     lineHeight: 26,
                   }}
                   style={styles.inputText}
-                  onChangeText={onChange}
-                  value={value}
+                  {...{ ...field, ...fieldState }}
                 />
               )}
             />
@@ -309,18 +314,25 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
               {methods.getValues('name')}
             </Text>
           )}
+          {methods.formState.errors.name && (
+            <Text
+              style={{
+                color: Colors.reds.redDark,
+              }}
+            >
+              {methods.formState.errors.name.message}
+            </Text>
+          )}
         </View>
 
         <View>
           {editable ? (
             <Controller
               name="description"
-              render={({ field: { onChange, value } }) => (
+              render={({ field, fieldState }) => (
                 <Input
                   editable={editable}
                   title="Descrição"
-                  onChangeText={onChange}
-                  value={value}
                   style={[
                     styles.inputText,
                     {
@@ -330,11 +342,21 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                   ]}
                   multiline
                   maxLength={150}
+                  {...{ ...field, ...fieldState }}
                 />
               )}
             />
           ) : (
             <Text style={styles.info}>{methods.getValues('description')}</Text>
+          )}
+          {methods.formState.errors.description && (
+            <Text
+              style={{
+                color: Colors.reds.redDark,
+              }}
+            >
+              {methods.formState.errors.description.message}
+            </Text>
           )}
         </View>
 
@@ -351,34 +373,51 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
               <View>
                 <Controller
                   name="date"
-                  render={({ field: { onChange, value } }) => (
+                  render={({ field, fieldState }) => (
                     <Input
                       editable={editable}
+                      masked
+                      maskedType="99/99/9999"
                       title="Data"
                       style={styles.inputDatetime}
-                      // keyboardType="numeric"
-                      onChangeText={onChange}
-                      value={value}
-                      maxLength={10}
+                      {...{ ...field, ...fieldState }}
                     />
                   )}
                 />
+                {methods.formState.errors.date && (
+                  <Text
+                    style={{
+                      color: Colors.reds.redDark,
+                    }}
+                  >
+                    {methods.formState.errors.date.message}
+                  </Text>
+                )}
               </View>
 
               <View>
                 <Controller
                   name="time"
-                  render={({ field: { onChange, value } }) => (
+                  render={({ field, fieldState }) => (
                     <Input
                       editable={editable}
+                      masked
+                      maskedType="99:99"
                       title="Hora"
                       style={styles.inputDatetime}
-                      // keyboardType="numeric"
-                      onChangeText={onChange}
-                      value={value}
+                      {...{ ...field, ...fieldState }}
                     />
                   )}
                 />
+                {methods.formState.errors.time && (
+                  <Text
+                    style={{
+                      color: Colors.reds.redDark,
+                    }}
+                  >
+                    {methods.formState.errors.time.message}
+                  </Text>
+                )}
               </View>
             </View>
           ) : (
@@ -456,7 +495,13 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
                   fontFamily: Fonts.bold,
                   color: Colors.white,
                 }}
-                style={styles.submitButtonContainer}
+                style={[
+                  styles.submitButtonContainer,
+                  {
+                    opacity: isSubmitDisabled ? 0.5 : 1,
+                  },
+                ]}
+                disabled={isSubmitDisabled}
               />
 
               <Button

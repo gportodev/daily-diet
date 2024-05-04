@@ -20,7 +20,13 @@ const Input = forwardRef<TextInput, InputProps>((props, ref) => {
     <>
       {title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
       {masked && (
-        <MaskedTextInput {...rest} mask={maskedType} onChangeText={onChange} />
+        <MaskedTextInput
+          {...rest}
+          mask={maskedType}
+          value={value}
+          onChangeText={onChange}
+          keyboardType="numeric"
+        />
       )}
 
       {!masked && (
