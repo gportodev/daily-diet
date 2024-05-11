@@ -9,14 +9,15 @@ import React, {
   useCallback,
 } from 'react';
 
-import uuid from 'react-native-uuid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 
 type MealProps = {
   children: ReactNode;
 };
 
 export type ItemProps = {
-  id: string | number[];
+  id: string | Array<number | undefined> | undefined;
   name: string;
   date: string;
   time: string;
@@ -35,6 +36,7 @@ type MealContextList = {
   mealsStatistics: number;
   allMeals: number;
   mealsInDiet: number;
+  storeList: (list: ListProps[]) => Promise<void>;
 };
 
 const defaultValue: MealContextList = {
@@ -43,77 +45,13 @@ const defaultValue: MealContextList = {
   mealsStatistics: 0,
   allMeals: 0,
   mealsInDiet: 0,
+  storeList: async () => {},
 };
 
 const MealContext = createContext(defaultValue);
 
 function MealProvider({ children }: MealProps): JSX.Element {
-  const [mealList, setMealList] = useState<ListProps[]>([
-    {
-      day: '13/08/2022',
-      meals: [
-        {
-          id: uuid.v4(),
-          name: 'Sanduíche',
-          date: '13/08/2022',
-          time: '20:00',
-          description:
-            'Sanduíche de pão integral com atum e salada de alface e tomate',
-          isPartOfDiet: false,
-        },
-        {
-          id: uuid.v4(),
-          name: 'Vitamina de banana',
-          date: '13/08/2022',
-          time: '09:30',
-          description: 'Vitamina de banana',
-          isPartOfDiet: true,
-        },
-      ],
-    },
-    {
-      day: '12/08/2022',
-      meals: [
-        {
-          id: uuid.v4(),
-          name: 'Whey',
-          date: '12/08/2022',
-          time: '16:00',
-          description: 'Whey',
-          isPartOfDiet: true,
-        },
-        {
-          id: uuid.v4(),
-          name: 'Salada cesar com frango',
-          date: '12/08/2022',
-          time: '12:30',
-          description: 'Salada cesar com frango',
-          isPartOfDiet: true,
-        },
-      ],
-    },
-    {
-      day: '11/08/2022',
-      meals: [
-        {
-          id: uuid.v4(),
-          name: 'Whey',
-          date: '11/08/2022',
-          time: '16:00',
-          description: 'Whey',
-          isPartOfDiet: true,
-        },
-        {
-          id: uuid.v4(),
-          name: 'Salada cesar com frango',
-          date: '11/08/2022',
-          time: '12:30',
-          description: 'Salada cesar com frango',
-          isPartOfDiet: true,
-        },
-      ],
-    },
-  ]);
+  const [mealList, setMealList] = useState<ListProps[]>([]);
   const [mealsStatistics, setMealsStatistics] = useState(0);
   const [allMeals, setAllMeals] = useState(0);
   const [mealsInDiet, setMealsInDiet] = useState(0);
@@ -130,14 +68,43 @@ function MealProvider({ children }: MealProps): JSX.Element {
       inDietMealsCounter = inDietMealsCounter + dietItems;
     });
 
-    const statisticNumber = Number(
-      ((inDietMealsCounter * 100) / allMealsCounter).toFixed(2),
-    );
+    const statisticNumber =
+      mealList.length > 0
+        ? Number(((inDietMealsCounter * 100) / allMealsCounter).toFixed(2))
+        : 0;
 
     setAllMeals(allMealsCounter);
     setMealsInDiet(inDietMealsCounter);
     setMealsStatistics(statisticNumber);
   }, [mealList]);
+
+  const getList = async (): Promise<void> => {
+    try {
+      const jsonList = await AsyncStorage.getItem('list');
+
+      if (jsonList !== null) {
+        const convertedList = JSON.parse(jsonList);
+
+        setMealList(convertedList);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Houve um erro ao buscar a lista!');
+    }
+  };
+
+  const storeList = async (list: ListProps[]): Promise<void> => {
+    try {
+      const jsonList = JSON.stringify(list);
+
+      await AsyncStorage.setItem('list', jsonList);
+    } catch (error) {
+      Alert.alert('Erro', 'Houve um erro ao salvar a lista!');
+    }
+  };
+
+  useEffect(() => {
+    void getList();
+  }, []);
 
   useEffect(() => {
     handleDietStatistics();
@@ -145,7 +112,14 @@ function MealProvider({ children }: MealProps): JSX.Element {
 
   return (
     <MealContext.Provider
-      value={{ mealList, setMealList, mealsStatistics, allMeals, mealsInDiet }}
+      value={{
+        mealList,
+        setMealList,
+        mealsStatistics,
+        allMeals,
+        mealsInDiet,
+        storeList,
+      }}
     >
       {children}
     </MealContext.Provider>

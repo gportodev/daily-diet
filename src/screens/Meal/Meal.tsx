@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Input } from '../../components/Input';
@@ -18,7 +18,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { schema } from '../Home/helpers';
 
 function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
-  const { mealList, setMealList } = useMeal();
+  const { mealList, setMealList, storeList } = useMeal();
   const { id, name, description, date, time, isPartOfDiet } = route.params;
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,35 +43,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   const watchDate = methods.watch('date');
   const watchIsPartOfDiet = methods.watch('isPartOfDiet');
 
-  const buttons: ButtonProps[] = [
-    {
-      title: 'Cancelar',
-      onPress: () => {
-        setModal(!modal);
-      },
-      titleStyle: {
-        fontSize: 14,
-        fontFamily: Fonts.bold,
-        lineHeight: 18.2,
-        color: Colors.grays.gray1,
-      },
-    },
-    {
-      title: 'Sim, excluir',
-      onPress: handleDeleteMeal,
-      titleStyle: {
-        fontSize: 14,
-        fontFamily: Fonts.bold,
-        lineHeight: 18.2,
-        color: Colors.white,
-      },
-      style: {
-        backgroundColor: Colors.grays.gray2,
-      },
-    },
-  ];
-
-  const handleEdit = (): void => {
+  const handleEdit = useCallback(async () => {
     setIsLoading(!isLoading);
 
     const findPreviousItemList = mealList.find(item => item.day === date);
@@ -79,7 +51,6 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
     const dayListMeal = mealList.find(item => item.day === watchDate);
 
     if (!dayListMeal && findPreviousItemList) {
-      console.log('CENÁRIO: Nova data');
       const filteredList = findPreviousItemList.meals.filter(
         item => item.id !== watchId,
       );
@@ -109,6 +80,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
       const listWithMeals = updatedList.filter(item => item.meals.length > 0);
 
       setMealList(listWithMeals);
+      await storeList(listWithMeals);
     } else {
       // update the item props changing the date to a existing one
 
@@ -137,8 +109,10 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
         const listWithMeals = updatedList.filter(item => item.meals.length > 0);
 
         setMealList(listWithMeals);
+        await storeList(listWithMeals);
       } else if (dayListMeal) {
         // update item props but not the date
+
         const updateDayListMeal = dayListMeal.meals.map(item => {
           if (item.id === watchId) {
             const newMeal = methods.getValues();
@@ -158,6 +132,7 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
         });
 
         setMealList(updatedList);
+        await storeList(updatedList);
       }
     }
 
@@ -165,9 +140,19 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
       setIsLoading(!isLoading);
       navigation.navigate(`Home`);
     }, 3000);
-  };
+  }, [
+    date,
+    isLoading,
+    mealList,
+    methods,
+    navigation,
+    setMealList,
+    storeList,
+    watchDate,
+    watchId,
+  ]);
 
-  const handleDeleteMeal = (): void => {
+  const handleDeleteMeal = useCallback(async () => {
     setIsLoading(!isLoading);
 
     const dayListMeal = mealList.find(item => {
@@ -190,23 +175,60 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
 
       setMealList(newMealList);
       setModal(!modal);
-
-      setTimeout(() => {
-        setIsLoading(!isLoading);
-        navigation.navigate(`Home`);
-      }, 3000);
+      await storeList(newMealList);
     } else {
       const newMealList = mealList.filter(item => item.day !== watchDate);
 
       setMealList(newMealList);
       setModal(!modal);
-
-      setTimeout(() => {
-        setIsLoading(!isLoading);
-        navigation.navigate(`Home`);
-      }, 3000);
+      await storeList(newMealList);
     }
-  };
+
+    setTimeout(() => {
+      setIsLoading(!isLoading);
+      navigation.navigate(`Home`);
+    }, 3000);
+  }, [
+    isLoading,
+    mealList,
+    modal,
+    navigation,
+    setMealList,
+    storeList,
+    watchDate,
+    watchName,
+  ]);
+
+  const buttons: ButtonProps[] = useMemo(
+    () => [
+      {
+        title: 'Cancelar',
+        onPress: () => {
+          setModal(!modal);
+        },
+        titleStyle: {
+          fontSize: 14,
+          fontFamily: Fonts.bold,
+          lineHeight: 18.2,
+          color: Colors.grays.gray1,
+        },
+      },
+      {
+        title: 'Sim, excluir',
+        onPress: handleDeleteMeal,
+        titleStyle: {
+          fontSize: 14,
+          fontFamily: Fonts.bold,
+          lineHeight: 18.2,
+          color: Colors.white,
+        },
+        style: {
+          backgroundColor: Colors.grays.gray2,
+        },
+      },
+    ],
+    [handleDeleteMeal, modal],
+  );
 
   const handleGoBack = (): void => {
     navigation.goBack();
@@ -277,8 +299,8 @@ function Meal({ navigation, route }: StackScreenProps<'Meal'>): JSX.Element {
   };
 
   const isSubmitDisabled = useMemo(
-    () => !methods.formState.isDirty || !methods.formState.isValid,
-    [methods.formState.isDirty, methods.formState.isValid],
+    () => !methods.formState.isValid,
+    [methods.formState.isValid],
   );
 
   const renderContent = (): JSX.Element => (

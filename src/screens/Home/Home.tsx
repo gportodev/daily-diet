@@ -12,10 +12,11 @@ import { List } from '../../components/List';
 import { useNavigation } from '@react-navigation/native';
 import { useMeal } from '../../context/Context';
 import { getArrowStatus, getCardStatus } from './helpers';
+import { NavigationProps } from '../../routes/types';
 
 function Home(): JSX.Element {
   const { mealsStatistics } = useMeal();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProps>();
 
   const handleNewMeal = (): void => {
     navigation.navigate('New');

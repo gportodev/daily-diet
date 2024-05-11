@@ -3,7 +3,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Input } from '../../components/Input';
 import styles from './styles';
 import { Button } from '../../components/Button';
@@ -17,6 +17,7 @@ import { ItemProps, ListProps, useMeal } from '../../context/Context';
 import { Loader } from '../../components/Loader/Loader';
 import { schema } from '../Home/helpers';
 import { ValidationMessage } from '../../components/ValidationMessage';
+import uuid from 'react-native-uuid';
 
 type ButtonProp = {
   active: boolean;
@@ -25,7 +26,7 @@ type ButtonProp = {
 };
 
 function New(): JSX.Element {
-  const { mealList, setMealList } = useMeal();
+  const { mealList, setMealList, storeList } = useMeal();
   const [isLoading, setIsLoading] = useState(false);
 
   const [positiveButton, setPositiveButton] = useState<ButtonProp>({
@@ -42,6 +43,7 @@ function New(): JSX.Element {
 
   const methods = useForm<ItemProps>({
     defaultValues: {
+      id: uuid.v4(),
       name: '',
       description: '',
       date: '',
@@ -57,7 +59,7 @@ function New(): JSX.Element {
 
   const navigation = useNavigation<NavigationProps>();
 
-  const dietOptionSelected = positiveButton || negativeButton;
+  const dietOptionSelected = positiveButton.active || negativeButton.active;
 
   const isSubmitDisabled = useMemo(
     () =>
@@ -99,40 +101,49 @@ function New(): JSX.Element {
     navigation.goBack();
   };
 
-  const handleNewMeal = (): void => {
+  const handleNewMeal = async (): Promise<void> => {
     setIsLoading(!isLoading);
 
-    const dayListMeal = mealList.find(item => {
-      return item.day === watchDate;
-    });
+    try {
+      const dayListMeal = mealList.find(item => {
+        return item.day === watchDate;
+      });
 
-    if (dayListMeal) {
-      // add new item to an existing list meal
-      const newMeal = methods.getValues();
+      if (dayListMeal) {
+        // add new item to an existing list meal
 
-      dayListMeal.meals.push(newMeal);
+        const newMeal = methods.getValues();
 
-      const arr = [...mealList];
+        dayListMeal.meals.push(newMeal);
 
-      setMealList(arr);
-    } else {
-      // add item to a new list meal
-      const newDayListMeal: ListProps = {
-        day: watchDate,
-        meals: [methods.getValues()],
-      };
+        const arr = [...mealList];
 
-      const arr = [...mealList];
+        setMealList(arr);
 
-      arr.push(newDayListMeal);
+        await storeList(arr);
+      } else {
+        // add item to a new list meal
 
-      setMealList(arr);
+        const newDayListMeal: ListProps = {
+          day: watchDate,
+          meals: [methods.getValues()],
+        };
+
+        const arr = [...mealList];
+
+        arr.push(newDayListMeal);
+
+        setMealList(arr);
+        await storeList(arr);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Houve um erro ao salvar a lista!');
+    } finally {
+      setTimeout(() => {
+        setIsLoading(!isLoading);
+        navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
+      }, 3000);
     }
-
-    setTimeout(() => {
-      setIsLoading(!isLoading);
-      navigation.navigate(`Feedback`, { partOfDiet: watchIsPartOfDiet });
-    }, 3000);
   };
 
   const renderHeader = (): JSX.Element => (
