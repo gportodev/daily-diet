@@ -1,20 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Routes } from './src/routes';
 
-export default function App() {
+import useCachedResources from './src/hooks/useCachedResources';
+import { StatusBar } from 'expo-status-bar';
+import { Loader } from './src/components/Loader/Loader';
+import { MealProvider } from './src/context/Context';
+
+export default function App(): JSX.Element {
+  const isLoading = useCachedResources();
+
+  if (!isLoading) {
+    return <Loader />;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+    <>
       <StatusBar style="auto" />
-    </View>
+      <MealProvider>
+        <Routes />
+      </MealProvider>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
