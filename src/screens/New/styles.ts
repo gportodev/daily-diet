@@ -48,7 +48,7 @@ export default StyleSheet.create({
   },
   validateButtonContainer: {
     height: 50,
-    width: 159.5,
+    width: (width - 68) / 2,
     gap: 8,
     justifyContent: 'center',
     alignItems: 'center',

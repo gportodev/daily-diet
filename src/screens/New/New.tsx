@@ -265,8 +265,6 @@ function New(): JSX.Element {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              gap: 20,
-              height: 70,
             }}
           >
             <Button
