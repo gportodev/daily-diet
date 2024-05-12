@@ -1,0 +1,22 @@
+{
+  "cli": {
+    "version": ">= 5.9.1"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {},
+    "homologation": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
